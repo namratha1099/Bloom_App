@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bloom — daily journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Caveat:wght@500;700&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5EFF9; --surface:#FFFFFF; --ink:#33243F; --soft:#7A6A88; --line:#E6DCEF;
+  --accent:#8E5FB8; --moss:#5F8452; --grass:#79B96A; --petal:#EE8FA8; --butter:#F2C85B;
+  --sky1:#9FC9F3; --skyM:#F6C9DD; --sky2:#FFE2B8; --hill1:#B5DB9B; --hill2:#8FC57F; --soil:#B08562; --soil2:#8E6A4C; --onaccent:#FFFFFF;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1A1422; --surface:#271E31; --ink:#F1E8F8; --soft:#B6A6C4; --line:#3B2F47;
+  --accent:#C49BEA; --moss:#8DB57D; --grass:#5E8752; --petal:#F2A3B9; --butter:#F4D27A;
+  --sky1:#141B3A; --skyM:#3A2C5E; --sky2:#6B3F6E; --hill1:#2F5048; --hill2:#25433B; --soil:#5E4A3A; --soil2:#4A3A2D; --onaccent:#1A1422; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1A1422; --surface:#271E31; --ink:#F1E8F8; --soft:#B6A6C4; --line:#3B2F47;
+  --accent:#C49BEA; --moss:#8DB57D; --grass:#5E8752; --petal:#F2A3B9; --butter:#F4D27A;
+  --sky1:#141B3A; --skyM:#3A2C5E; --sky2:#6B3F6E; --hill1:#2F5048; --hill2:#25433B; --soil:#5E4A3A; --soil2:#4A3A2D; --onaccent:#1A1422; color-scheme:dark}
+:root[data-palette="forest"]{--accent:#4F8A5B;--petal:#E9A06B}
+:root[data-palette="ocean"]{--accent:#3D7FB0;--petal:#7FC6D9}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Nunito,system-ui,sans-serif;font-size:16px;line-height:1.5}
+h1,h2,h3{font-family:"Young Serif",Georgia,serif;font-weight:400;margin:0}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:820px;margin:0 auto;padding:18px 16px 110px}
+header{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+h1{font-size:2.3rem;line-height:1}
+.hero{padding:14px 16px;border-radius:24px;background:linear-gradient(120deg,color-mix(in srgb,var(--accent) 16%,var(--surface)),color-mix(in srgb,var(--petal) 18%,var(--surface)) 60%,color-mix(in srgb,var(--butter) 20%,var(--surface)));border:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand small{color:var(--soft);font-size:.9rem}
+.logo{width:52px;height:52px;border-radius:18px;display:grid;place-items:center;font-size:1.8rem;background:var(--surface);box-shadow:0 6px 16px color-mix(in srgb,var(--accent) 25%,transparent);animation:spinslow 18s linear infinite}
+@keyframes spinslow{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.logo{animation:none}}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{display:flex;align-items:center;gap:8px;border-radius:18px;padding:8px 14px 8px 8px;min-width:104px;color:#2A1E33;box-shadow:0 4px 12px rgba(60,30,80,.10)}
+.stat .ic{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;font-size:1.2rem;background:rgba(255,255,255,.7)}
+.s1{background:linear-gradient(135deg,#FFF1B8,#FFD37A)}.s2{background:linear-gradient(135deg,#FFD3C2,#FF9E7A)}.s3{background:linear-gradient(135deg,#F9D7F0,#D9B8FF)}
+.stat b{display:block;font-size:1.35rem;font-family:"Young Serif",serif;font-weight:400;line-height:1.1}
+.stat small{font-size:.72rem;opacity:.75;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+
+/* week strip */
+.week{display:grid;grid-template-columns:auto repeat(7,1fr) auto;gap:6px;align-items:center;margin:16px 0 4px}
+.week .arrow{border:0;background:var(--surface);border-radius:50%;width:36px;height:36px;box-shadow:0 2px 8px rgba(60,30,80,.12);font-size:1.2rem}
+.week .arrow:disabled{opacity:.3;cursor:default}
+.dchip{border:2px solid transparent;background:var(--surface);border-radius:999px;padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--soft);height:92px;justify-content:center;box-shadow:0 2px 8px rgba(60,30,80,.07);transition:transform .2s}
+.dchip:hover{transform:translateY(-2px)}
+.dchip .e{font-size:1.15rem;line-height:1.3}
+.dchip .n{font-weight:800;color:var(--ink);font-size:1rem;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.55)}
+.dchip[aria-current="date"]{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 8px 18px color-mix(in srgb,var(--accent) 30%,transparent)}
+.dchip[aria-current="date"] .n{background:var(--accent);color:var(--onaccent)}
+.dchip:disabled{opacity:.3;cursor:default}
+.dchip .dots{height:6px;display:flex;gap:2px}
+.dchip .dots i{width:5px;height:5px;border-radius:50%;background:var(--moss)}
+.datelabel{font-family:"Young Serif",serif;font-size:1.25rem;margin:10px 0 2px}
+.unlockbar{font-size:.88rem;color:var(--soft);margin-bottom:14px}
+
+/* garden */
+.garden{position:relative;isolation:isolate;height:260px;border-radius:26px 26px 10px 10px;overflow:hidden;border:1px solid var(--line);
+  background:linear-gradient(180deg,var(--sky1),var(--skyM) 48%,var(--sky2) 78%);user-select:none;box-shadow:0 10px 30px color-mix(in srgb,var(--accent) 18%,transparent)}
+.garden::before{content:"";position:absolute;left:-10%;right:-10%;bottom:50px;height:110px;pointer-events:none;
+  background:radial-gradient(38% 100% at 22% 100%,var(--hill2) 98%,transparent 100%),radial-gradient(45% 80% at 72% 100%,var(--hill1) 98%,transparent 100%),radial-gradient(30% 60% at 98% 100%,var(--hill2) 98%,transparent 100%)}
+.garden.w-cloudy,.garden.w-rainy{--sky1:#9EAABB;--skyM:#C9CFDA;--sky2:#E3E2E8;--hill1:#A3BE9F;--hill2:#86A786}
+.garden.w-snowy{--sky1:#CFDCEB;--skyM:#E8EEF6;--sky2:#F8F4F2;--hill1:#F1F4F9;--hill2:#DDE6EF}
+.w-cloudy .celestial,.w-rainy .celestial{opacity:.25}
+.w-snowy .ground{background:linear-gradient(#F4F7FB 0 14px,var(--soil) 14px,var(--soil2))}
+.w-snowy .ground::before{background:radial-gradient(circle at 6px 10px,#F4F7FB 6px,transparent 7px) 0 0/12px 10px repeat-x}
+.cloud.dark{background:rgba(130,140,158,.85)}
+.drop{position:absolute;top:-20px;width:2px;height:14px;border-radius:2px;background:rgba(110,140,195,.75);animation:rain .8s linear infinite;z-index:150;pointer-events:none}
+@keyframes rain{to{transform:translate(-14px,300px)}}
+.flake{position:absolute;top:-14px;color:#fff;font-size:12px;animation:snow 7s linear infinite;z-index:150;pointer-events:none;text-shadow:0 0 2px rgba(0,0,0,.2)}
+@keyframes snow{50%{transform:translate(18px,150px)}to{transform:translate(-6px,300px)}}
+.garden.night{--sky1:#141B3A;--skyM:#3A2C5E;--sky2:#6B3F6E;--hill1:#2F5048;--hill2:#25433B}
+.garden.night.w-snowy{--hill1:#B9C3D6;--hill2:#9EA9C0}
+.celestial{position:absolute;right:30px;top:20px;width:48px;height:48px;border-radius:50%;background:var(--butter);box-shadow:0 0 0 10px color-mix(in srgb,var(--butter) 25%,transparent)}
+.garden.night .celestial{background:#F3EBD3;box-shadow:inset -12px -4px 0 0 #D9CFB2}
+.star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0}
+.garden.night .star{opacity:.8}
+.cloud{position:absolute;height:22px;width:70px;border-radius:20px;background:rgba(255,255,255,.75);animation:drift 60s linear infinite}
+.cloud::before{content:"";position:absolute;width:34px;height:34px;border-radius:50%;background:inherit;left:14px;top:-14px}
+.garden.night .cloud{opacity:.15}
+@keyframes drift{from{transform:translateX(-120px)}to{transform:translateX(900px)}}
+.ground{position:absolute;left:0;right:0;bottom:0;height:62px;background:linear-gradient(var(--grass) 0 12px,var(--soil) 12px,var(--soil2))}
+.ground::before{content:"";position:absolute;left:0;right:0;top:-8px;height:10px;
+  background:radial-gradient(circle at 6px 10px,var(--grass) 6px,transparent 7px) 0 0/12px 10px repeat-x}
+.plant{position:absolute;bottom:44px;transform-origin:bottom center;border:0;background:none;padding:0}
+.plant svg{display:block;transform-origin:bottom center;animation:sway 4s ease-in-out infinite}
+.plant.new svg{animation:grow .9s cubic-bezier(.3,1.6,.5,1),sway 4s ease-in-out .9s infinite}
+.plant:hover svg,.plant:focus-visible svg{filter:brightness(1.08)}
+.plant.wiggle svg{animation:wiggle .6s ease}
+@keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+@keyframes grow{from{transform:scale(.1,0)}to{transform:scale(1)}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
+.bfly{position:absolute;font-size:18px;animation:flutter 9s ease-in-out infinite;pointer-events:none}
+@keyframes flutter{0%{transform:translate(0,0)}25%{transform:translate(80px,-30px)}50%{transform:translate(160px,10px)}75%{transform:translate(70px,40px)}100%{transform:translate(0,0)}}
+.gtip{position:absolute;background:var(--ink);color:var(--bg);font-size:.82rem;padding:5px 10px;border-radius:10px;pointer-events:none;white-space:nowrap;transform:translate(-50%,-100%);z-index:5}
+.gempty{position:absolute;left:0;right:0;top:38%;text-align:center;color:var(--soft)}
+.gbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;font-size:.88rem;color:var(--soft);flex-wrap:wrap}
+.chipbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:.88rem}
+.chipbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:800}
+@media (prefers-reduced-motion:reduce){.plant svg,.plant.new svg,.cloud,.bfly,.drop,.flake{animation:none}}
+.stroopword{font-family:"Young Serif",serif;font-size:2.6rem;margin:6px 0 12px}
+.cbtns{display:flex;gap:8px;flex-wrap:wrap}
+.catcharea{position:relative;height:240px;border-radius:16px;background:linear-gradient(var(--sky1),var(--sky2));overflow:hidden;display:grid;place-items:center;max-width:480px}
+.bug{position:absolute;border:0;background:none;font-size:2rem;padding:4px;animation:bob 1.4s ease-in-out forwards}
+.bug.pop{transform:scale(1.7);opacity:0;transition:.2s}
+@keyframes bob{0%{transform:scale(0)}20%{transform:scale(1)}100%{transform:translate(12px,-24px)}}
+.simon{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:240px;margin-bottom:10px}
+.simon button{font-size:2.4rem;aspect-ratio:1;border-radius:18px;border:2px solid var(--line);background:var(--bg);transition:.15s}
+.simon button.lit{background:var(--butter);transform:scale(1.08);border-color:var(--accent)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:360px;margin-top:10px}
+.opts button{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px;font-weight:700}
+.weekendp{background:linear-gradient(135deg,color-mix(in srgb,var(--petal) 28%,var(--surface)),var(--surface))}
+.wheelwrap{position:relative;width:180px;height:180px}
+.pointer{position:absolute;left:50%;top:-16px;transform:translateX(-50%);font-size:1.3rem;color:var(--ink);z-index:2}
+#wheel{transition:transform 3.2s cubic-bezier(.2,.8,.2,1);display:block}
+.maintabs{display:flex;gap:6px;margin-top:18px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:5px;position:sticky;top:env(safe-area-inset-top,0px);z-index:8}
+.maintabs button{flex:1;border:0;background:none;border-radius:14px;padding:8px 6px;font-family:"Young Serif",serif;font-size:1rem;color:var(--soft);display:flex;flex-direction:column;align-items:center;gap:2px;transition:.2s}
+.maintabs button span{font-size:1.3rem;transition:transform .2s}
+.maintabs button:hover span{transform:scale(1.15) rotate(-6deg)}
+.maintabs button[aria-selected="true"]{background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--petal) 70%,var(--accent)));color:#fff;box-shadow:0 6px 14px color-mix(in srgb,var(--accent) 35%,transparent)}
+.tabpane[hidden]{display:none}
+.mealhead{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:18px;border-radius:20px;margin-top:18px;
+  background:linear-gradient(135deg,#FFE9C7,#FFD6D6 55%,#DDF3E2);color:#3A2A1E}
+.mealhead h2{font-size:1.4rem}
+.mealhead p{margin:2px 0 0;font-size:.92rem;opacity:.8}
+.ring{--p:0;width:86px;height:86px;border-radius:50%;display:grid;place-items:center;flex:none;
+  background:conic-gradient(#3FAE6A calc(var(--p)*1%),rgba(255,255,255,.7) 0)}
+.ring span{width:66px;height:66px;border-radius:50%;background:#FFF8EE;display:grid;place-items:center;font-weight:800;font-size:1.05rem;color:#2E6B45}
+.weekplates{display:flex;gap:6px;margin-left:auto}
+.weekplates div{display:flex;flex-direction:column;align-items:center;font-size:.72rem;gap:2px}
+.weekplates i{width:26px;height:26px;border-radius:50%;border:3px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.12);background:#eee}
+.meals{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px}
+.meal{border-radius:22px;padding:16px;border:1px solid #EADFD3;background:#FFFCF7;color:#3A2A1E;transition:background .3s,border-color .3s;position:relative;overflow:hidden}
+.meal.healthy{background:linear-gradient(160deg,#E3F6E8,#C9EDD3);border-color:#7CCB95;color:#1F3B2A}
+.meal.unhealthy{background:linear-gradient(160deg,#FFEBD9,#FFD1B0);border-color:#F2A06B;color:#4A2A14}
+.meal.skipped{background:repeating-linear-gradient(135deg,#F6F3F8 0 12px,#ECE7F0 12px 24px)}
+.meal .top{display:flex;align-items:center;gap:12px}
+.plate{width:74px;height:74px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:2.3rem;
+  background:radial-gradient(circle,#fff 52%,#EDE6F2 53%,#fff 64%,#E3DAEA 66%);box-shadow:0 4px 10px rgba(60,30,80,.12)}
+.meal.healthy .plate{animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(.8)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+.meal h3{font-size:1.15rem}
+.meal .when{font-size:.8rem;opacity:.7}
+.meal .stamp{position:absolute;right:12px;top:10px;font-size:.72rem;font-weight:800;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.75)}
+.mopts{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.mopts button{border:2px solid rgba(0,0,0,.06);border-radius:12px;padding:8px 2px;font-weight:800;font-size:.8rem;background:rgba(255,255,255,.65);color:#3A2A1E}
+.mopts button span{display:block;font-size:1.3rem}
+.mopts .h[aria-pressed="true"]{background:#3FAE6A;color:#fff}
+.mopts .u[aria-pressed="true"]{background:#EE7B30;color:#fff}
+.mopts .s[aria-pressed="true"]{background:#8D8496;color:#fff}
+.meal input{width:100%;margin-top:10px;padding:8px 10px;border-radius:10px;border:1px solid rgba(0,0,0,.08);background:rgba(255,255,255,.75);color:#2A1E33}
+.mealtip{margin-top:12px;font-size:.92rem;color:var(--soft)}
+.cbtns button{border:2px solid var(--line);background:var(--bg);border-radius:12px;padding:8px 14px;font-weight:800}
+.rgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;max-width:380px}
+.rgrid button{aspect-ratio:1;font-size:1.6rem;border:2px solid var(--line);background:var(--bg);border-radius:12px}
+.rgrid button.hit{border-color:var(--moss);background:color-mix(in srgb,var(--moss) 25%,var(--bg))}
+.rgrid button.miss{border-color:#D9534F;opacity:.5}
+.seqrow{font-family:"Young Serif",serif;font-size:1.8rem;letter-spacing:.05em;margin-bottom:10px}
+
+/* panels */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;margin-top:18px}
+.panel h2{font-size:1.3rem;margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.panel h2 small{font-family:Nunito,sans-serif;font-size:.85rem;color:var(--soft)}
+.progress{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-bottom:12px}
+.progress i{display:block;height:100%;background:var(--moss);transition:width .4s}
+.addrow{display:flex;gap:8px}
+.addrow input{flex:1;min-width:0;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg)}
+.btn{background:var(--accent);color:var(--onaccent);border:0;border-radius:12px;padding:10px 16px;font-weight:800}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+ul{list-style:none;padding:0;margin:10px 0 0}
+li.task{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px dashed var(--line)}
+li.task label{flex:1;display:flex;gap:12px;align-items:center;cursor:pointer}
+li.task input{width:22px;height:22px;accent-color:var(--moss)}
+li.task.done .t{text-decoration:line-through;color:var(--soft)}
+li.task .seed{font-size:1.1rem}
+li.task .del{background:none;border:0;color:var(--soft);font-size:1rem}
+.moods{display:flex;gap:6px;flex-wrap:wrap}
+.moods button{font-size:1.7rem;background:var(--bg);border:2px solid transparent;border-radius:14px;width:52px;height:52px;transition:transform .15s}
+.moods button[aria-pressed="true"]{border-color:var(--accent);transform:scale(1.1)}
+textarea{width:100%;min-height:96px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.two .panel{margin-top:18px}
+@media (max-width:640px){.two{grid-template-columns:1fr;gap:0}}
+
+/* games */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.scr{font-family:"Young Serif",serif;font-size:2rem;letter-spacing:.2em}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:320px}
+.card{aspect-ratio:1;border-radius:12px;border:0;background:var(--accent);font-size:1.6rem;transition:transform .2s}
+.card.open{background:var(--bg);transform:rotateY(180deg) scaleX(-1)}
+.msg{margin-top:10px;font-weight:600;color:var(--moss);min-height:1.5em}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row input{padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);width:150px}
+.slide{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;width:min(300px,100%);aspect-ratio:1;background:var(--line);border-radius:14px;overflow:hidden;padding:3px}
+.tile{border:0;padding:0;background-size:300% 300%;border-radius:6px;transition:transform .12s}
+.tile:active{transform:scale(.96)}
+.tile.blank{background:var(--bg)!important;cursor:default}
+.preview{width:90px;aspect-ratio:1;border-radius:10px;background-size:cover;border:1px solid var(--line)}
+.solved{display:flex;align-items:center;gap:12px;color:var(--moss);font-weight:700}
+.archive{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+.archive button{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:5px 9px;font-size:.82rem}
+.archive button.won{border-color:var(--moss);color:var(--moss)}
+.archive button[aria-current="true"]{background:var(--accent);color:var(--onaccent);border-color:var(--accent)}
+
+.badges{display:flex;gap:10px;flex-wrap:wrap}
+.badge{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:8px 12px;font-size:.9rem}
+.badge.off{opacity:.4}
+.timer{font-family:"Young Serif",serif;font-size:2.4rem}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+  background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;z-index:20}
+.toast.show{opacity:1}
+.confetti{position:fixed;top:-20px;font-size:20px;pointer-events:none;z-index:19;animation:fall 1.8s ease-in forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg);opacity:.6}}
+.monthtag{position:absolute;left:16px;top:12px;z-index:6;font-family:"Young Serif",serif;color:var(--ink);line-height:1.15;pointer-events:none}
+.monthtag b{display:block;font-weight:400;font-size:1.6rem}
+.monthtag small{font-family:Nunito,sans-serif;font-size:.8rem;color:var(--soft)}
+.garden.night .monthtag{color:#F1E8F8}.garden.night .monthtag small{color:#C9BEDB}
+.leaf{position:absolute;top:-20px;font-size:14px;animation:leaffall 8s linear infinite;z-index:4;pointer-events:none}
+@keyframes leaffall{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(24px,140px) rotate(200deg)}100%{transform:translate(-10px,290px) rotate(380deg)}}
+@media (prefers-reduced-motion:reduce){.leaf{display:none}}
+.odd{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:360px}
+.odd button{font-size:1.8rem;aspect-ratio:1;border:1px solid var(--line);background:var(--bg);border-radius:14px}
+.giftwrap{position:fixed;inset:0;background:rgba(20,10,30,.55);display:grid;place-items:center;z-index:30;padding:20px}
+.giftcard{background:var(--surface);border-radius:24px;padding:28px;text-align:center;max-width:340px;width:100%}
+.giftbox{font-size:5rem;border:0;background:none;animation:shake 1.2s ease-in-out infinite}
+@keyframes shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-8deg)}40%{transform:rotate(8deg)}60%{transform:rotate(-4deg)}}
+.giftdots{display:flex;gap:6px;margin-bottom:12px}
+.giftdots i{width:28px;height:8px;border-radius:99px;background:var(--line)}
+.giftdots i.on{background:var(--accent)}
+.stickers{display:flex;flex-wrap:wrap;gap:8px;font-size:2rem}
+.backup textarea{min-height:70px;font-size:.8rem;font-family:ui-monospace,monospace;margin-top:10px}
+
+/* ===== style refresh ===== */
+:root{--sky1:#7FD6CF;--skyM:#FFE6B5;--sky2:#FFB59E;--hill1:#A9DB8B;--hill2:#62BC84;--hill3:#C9B6EA;--grass:#6FC47F}
+.garden{border:0;border-radius:30px;height:270px;box-shadow:0 18px 40px -12px color-mix(in srgb,var(--accent) 40%,transparent),inset 0 0 0 1px rgba(255,255,255,.35)}
+.garden::after{content:"";position:absolute;left:-10%;right:-10%;bottom:54px;height:150px;z-index:-1;pointer-events:none;
+  background:radial-gradient(50% 70% at 30% 100%,var(--hill3) 98%,transparent 100%),radial-gradient(40% 60% at 85% 100%,var(--hill3) 98%,transparent 100%);opacity:.9}
+.garden .celestial{width:56px;height:56px;background:radial-gradient(circle at 40% 40%,#FFF6CF,#FFC94D 60%);box-shadow:0 0 40px 14px rgba(255,214,110,.55)}
+.garden.night{--sky1:#0B1030;--skyM:#251E58;--sky2:#5A2F70;--hill1:#2C5A57;--hill2:#1F443F;--hill3:#2E2A5C;--grass:#3E7A5E;--soil:#4B3A33;--soil2:#33271F}
+.garden.night::before{content:"";position:absolute;inset:-20% -10% 45% -10%;z-index:-1;pointer-events:none;filter:blur(16px);opacity:1;
+  background:linear-gradient(100deg,transparent 15%,rgba(80,255,190,.45) 30%,rgba(120,180,255,.35) 45%,transparent 60%,rgba(200,120,255,.35) 75%,transparent 90%);animation:aurora 14s ease-in-out infinite alternate}
+@keyframes aurora{from{transform:translateX(-6%) skewX(-8deg)}to{transform:translateX(6%) skewX(8deg)}}
+.garden.night .celestial{background:radial-gradient(circle at 35% 35%,#FFFDF2,#E9E1C6);box-shadow:0 0 30px 8px rgba(255,250,220,.35),inset -12px -4px 0 0 #D4CBA9}
+.garden.w-cloudy,.garden.w-rainy{--sky1:#9AAFC4;--skyM:#CBD3DF;--sky2:#E7DCE3;--hill3:#B4B9CF}
+.garden.w-snowy{--sky1:#BFD7F0;--skyM:#E6EEF8;--sky2:#FBEFF3;--hill3:#DCE3F2}
+.ground{background:linear-gradient(var(--grass) 0 14px,var(--soil) 14px,var(--soil2))}
+@media (prefers-reduced-motion:reduce){.garden.night::before{animation:none}}
+
+/* top: stats */
+.hero{background:linear-gradient(120deg,color-mix(in srgb,var(--accent) 16%,var(--surface)),var(--surface) 60%);border:1px solid var(--line);border-radius:26px;padding:16px 18px}
+.stats{gap:10px}
+.stat{flex-direction:column;align-items:flex-start;gap:0;min-width:96px;padding:10px 16px 10px 14px;border-radius:20px;position:relative;overflow:hidden;box-shadow:0 8px 20px -8px rgba(60,30,80,.35)}
+.stat::after{content:"";position:absolute;right:-18px;top:-18px;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.35)}
+.stat .ic{width:auto;height:auto;background:none;font-size:1.1rem;border-radius:0}
+.stat b{font-size:1.7rem}
+.stat small{font-size:.66rem;letter-spacing:.08em}
+.s1{background:linear-gradient(140deg,#FFE58A,#FFB347)}.s2{background:linear-gradient(140deg,#FFB4A2,#FF6B6B)}.s3{background:linear-gradient(140deg,#E2C6FF,#A78BFA)}
+
+/* top: days */
+.dchip{border-radius:20px;height:96px;gap:4px;border:2px solid var(--line);box-shadow:none;
+  background:linear-gradient(180deg,var(--surface) 58%,color-mix(in srgb,var(--mc,var(--line)) 80%,var(--surface)) 58%)}
+.dchip .n{background:none;width:auto;height:auto;font-family:"Young Serif",serif;font-size:1.3rem;font-weight:400}
+.dchip .e{font-size:1.25rem;filter:drop-shadow(0 1px 1px rgba(0,0,0,.15))}
+.dchip[aria-current="date"]{border-color:var(--accent);transform:translateY(-4px)}
+.dchip[aria-current="date"] .n{background:none;color:var(--accent)}
+.dchip .dots i{background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+.datelabel{font-size:1.4rem}
+
+/* mood */
+.moodpanel{background:radial-gradient(120% 90% at 0% 0%,color-mix(in srgb,var(--butter) 30%,var(--surface)),var(--surface) 60%)}
+.panel .sub{margin:-6px 0 12px;font-size:.88rem;color:var(--soft)}
+.moods{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:8px}
+.moods button{width:auto;height:auto;aspect-ratio:1;border-radius:50%;font-size:1.55rem;background:var(--bg);border:2px solid transparent;transition:transform .18s,box-shadow .18s}
+.moods button:hover{transform:translateY(-3px) scale(1.08)}
+.moods button[aria-pressed="true"]{transform:scale(1.15);box-shadow:0 0 0 4px var(--surface),0 0 0 6px var(--accent)}
+.moodlabel{font-family:"Young Serif",serif;font-size:1rem;color:var(--ink)}
+
+/* diary */
+.diary{background:#FFFBF1;border-color:#EADFC8;color:#3B2E22;position:relative}
+.diary h2{color:#3B2E22}
+.diary .pin{position:absolute;right:16px;top:10px;font-size:1.3rem;transform:rotate(12deg)}
+.diary textarea{background:repeating-linear-gradient(#FFFBF1 0 29px,#E6DCC6 29px 30px);border:0;border-left:2px solid #F2A7A7;border-radius:0;
+  font-family:Caveat,"Segoe Print",cursive;font-size:1.35rem;line-height:30px;padding:0 10px;min-height:150px;color:#3B2E22}
+.diary textarea::placeholder{color:#A8977E}
+
+/* gifts */
+.giftpanel{background:linear-gradient(160deg,color-mix(in srgb,var(--petal) 18%,var(--surface)),var(--surface) 55%)}
+.giftdots{display:flex;align-items:center;gap:0;margin:6px 0 18px}
+.gline{flex:1;height:3px;border-radius:2px;background:repeating-linear-gradient(90deg,var(--line) 0 6px,transparent 6px 10px)}
+.gstep{display:flex;flex-direction:column;align-items:center;gap:4px;width:auto;height:auto;background:none}
+.gstep span{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;font-size:1.3rem;background:var(--bg);border:2px dashed var(--line)}
+.gstep.on span{background:linear-gradient(140deg,#FFE58A,#FFB347);border:2px solid transparent;box-shadow:0 6px 14px -4px rgba(255,160,60,.6)}
+.gstep.big span{width:58px;height:58px;font-size:1.8rem;border-style:solid;border-color:var(--accent);animation:shake 2.4s ease-in-out infinite}
+.gstep small{font-size:.72rem;font-weight:800;color:var(--soft)}
+.shelflabel{font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--soft);margin-bottom:6px}
+.stickers{padding:10px 12px 14px;border-radius:12px;background:linear-gradient(transparent 78%,#C69C72 78%,#A87C55);min-height:64px;align-items:flex-end}
+.stickers span{filter:drop-shadow(0 3px 2px rgba(0,0,0,.2));transition:transform .2s}
+.stickers span:hover{transform:translateY(-4px) rotate(-6deg)}
+
+/* ===== account ===== */
+.hero{position:relative}
+.acct{position:absolute;right:14px;top:-14px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px 5px 6px;font-weight:800;font-size:.8rem;display:flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(60,30,80,.12);color:var(--ink)}
+.acct .av{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(140deg,var(--accent),var(--petal));color:#fff;font-size:.8rem}
+.acct .dot{width:8px;height:8px;border-radius:50%;background:#3FAE6A}
+.acct.off .dot{background:#C9C2CF}
+.modalwrap{position:fixed;inset:0;background:rgba(20,10,30,.55);display:grid;place-items:center;z-index:40;padding:20px}
+.modal{background:var(--surface);color:var(--ink);border-radius:26px;padding:24px;width:100%;max-width:380px;box-shadow:0 30px 60px -20px rgba(0,0,0,.45);position:relative}
+.modal .x{position:absolute;right:14px;top:12px;border:0;background:none;font-size:1.2rem;color:var(--soft)}
+.modal .hi{font-size:2.4rem;width:64px;height:64px;border-radius:20px;display:grid;place-items:center;background:linear-gradient(140deg,#FFE58A,#FFB4A2);margin-bottom:10px}
+.modal h2{font-size:1.45rem;margin-bottom:4px}
+.modal p{margin:0 0 14px;color:var(--soft);font-size:.92rem}
+.modal label{display:block;font-size:.8rem;font-weight:800;margin:10px 0 4px}
+.modal input{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg)}
+.modal .btn{width:100%;margin-top:14px;padding:12px}
+.modal .link{background:none;border:0;color:var(--accent);font-weight:800;padding:6px 0;margin-top:6px}
+.modal .row2{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.modal .err{color:#D2453D;font-weight:700;font-size:.88rem;min-height:1.3em;margin-top:8px}
+.modal .ok{color:#2E8B57}
+.choice{display:grid;gap:10px;margin-top:10px}
+.choice button{text-align:left;border:2px solid var(--line);background:var(--bg);border-radius:16px;padding:12px 14px;font-weight:800}
+.choice button small{display:block;font-weight:600;color:var(--soft)}
+.choice button:hover{border-color:var(--accent)}
+@media (max-width:560px){.acct{top:-12px;right:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="brand"><div class="logo">🌼</div><div><h1>Bloom</h1><small id="greet"></small></div></div>
+    <div class="stats">
+      <div class="stat s1"><span class="ic">✨</span><b id="points">0</b><small>Points</small></div>
+      <div class="stat s2"><span class="ic">🔥</span><b id="streak">0</b><small>Day streak</small></div>
+      <div class="stat s3"><span class="ic">🌸</span><b id="bloomCount">0</b><small>Blooms</small></div>
+    </div>
+    <button class="acct" id="acctBtn" aria-label="Account and sync">☁️ <span>Sign in</span></button>
+  </header>
+
+  <div class="week" id="week"></div>
+  <div class="datelabel" id="dateLabel"></div>
+  <div class="unlockbar" id="unlockbar"></div>
+
+  <div class="garden" id="garden" aria-label="Your garden. Each completed task grows a plant."></div>
+  <div class="gbar">
+    <span id="gcaption">Tap a plant to see which task grew it.</span>
+    <span class="row">
+      <button class="chipbtn" id="weatherBtn">☀️ Sunny</button>
+      <button class="chipbtn" id="waterBtn">💧 Water garden</button>
+      <button class="chipbtn" id="nightBtn" aria-pressed="false">🌙 Night</button>
+    </span>
+  </div>
+
+  <nav class="maintabs" role="tablist">
+    <button role="tab" data-tab="day" aria-selected="true"><span>📖</span>Daybook</button>
+    <button role="tab" data-tab="meals" aria-selected="false"><span>🥗</span>Plates</button>
+    <button role="tab" data-tab="games" aria-selected="false"><span>🎲</span>Playroom</button>
+  </nav>
+  <div class="tabpane" data-pane="day">
+  <div class="panel">
+    <h2>Tasks <small id="taskCount"></small></h2>
+    <div class="progress"><i id="prog" style="width:0"></i></div>
+    <div class="addrow">
+      <input id="taskInput" placeholder="Add a task, even a tiny one" aria-label="New task">
+      <button class="btn" id="addTask">Plant</button>
+    </div>
+    <ul id="taskList"></ul>
+  </div>
+
+  <div class="two">
+    <div class="panel moodpanel"><h2>How do you feel?</h2><p class="sub">Pick the face that fits your day</p><div class="moods" id="moods"></div></div>
+    <div class="panel diary"><h2>Dear diary <span class="pin">📌</span></h2><textarea id="note" placeholder="Today I noticed…"></textarea></div>
+  </div>
+
+  </div>
+  <div class="tabpane" data-pane="meals" hidden>
+    <div class="mealhead"><div class="ring" id="mealRing"><span id="mealPct">0%</span></div><div><h2>Eat well, bloom well</h2><p id="mealSum">Log your meals for the day.</p></div><div class="weekplates" id="weekPlates"></div></div>
+    <div class="meals" id="meals"></div>
+    <p class="mealtip" id="mealTip"></p>
+  </div>
+  <div class="tabpane" data-pane="games" hidden>
+  <div id="weekend"></div>
+  <div class="panel">
+    <h2>Games <small id="gameDay"></small></h2>
+    <div class="tabs" id="gameTabs"></div>
+    <div id="game"></div>
+    <div class="archive" id="archive" aria-label="Play games from earlier days"></div>
+  </div>
+  </div>
+
+  <div class="panel giftpanel"><h2>Gift trail <small id="giftNext"></small></h2><div class="giftdots" id="giftDots"></div><div class="shelflabel">Your sticker shelf</div><div class="stickers" id="stickers"></div></div>
+  <div id="unlocked"></div>
+  <div class="panel backup"><h2>Save &amp; backup <small>saves automatically in this browser</small></h2>
+    <div class="row"><button class="btn" id="dlBackup">Download backup</button><button class="btn ghost" id="showBackup">Show backup code</button><label class="btn ghost" style="cursor:pointer">Restore from file<input type="file" id="fileIn" accept=".json,application/json" hidden></label></div>
+    <textarea id="backupText" hidden aria-label="Backup code"></textarea>
+    <div class="row" id="restoreRow" hidden style="margin-top:8px"><button class="btn" id="restoreBtn">Restore from this code</button></div>
+    <div class="msg" id="backupMsg"></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const KEY="bloom-journal-v1";
+let S=null;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S)S={start:null,days:{},points:0,palette:"lilac"};
+const save=()=>{if(!window.__applying)S.updatedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(window.__cloudPush)window.__cloudPush()};
+const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const today=iso(new Date());
+if(!S.start){S.start=today;save()}
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+let cur=today, gameDay=today, gameKind=null;
+const day=k=>{const d=(S.days[k] ||= {tasks:[],mood:null,note:"",game:false,flowers:[]});d.games ||= {};if(d.game&&!d.games.legacy)d.games.legacy=true;return d};
+const dayNum=k=>Math.round((new Date(k+"T12:00")-new Date(S.start+"T12:00"))/864e5);
+const addDays=(k,n)=>{const d=new Date(k+"T12:00");d.setDate(d.getDate()+n);return iso(d)};
+
+const weeksIn=Math.floor(dayNum(today)/7)+1;
+const UNLOCKS=[
+  {week:2,id:"themes",name:"Garden colours",desc:"choose a palette and light or dark mode"},
+  {week:3,id:"badges",name:"Badges",desc:"earn badges for milestones"},
+  {week:4,id:"focus",name:"Focus timer",desc:"a 25-minute timer worth 15 points"},
+  {week:5,id:"gratitude",name:"Reflection prompt",desc:"a new question every day"},
+  {week:6,id:"streakbonus",name:"Streak bonus",desc:"double game points on 7+ day streaks"},
+];
+const has=id=>UNLOCKS.find(u=>u.id===id).week<=weeksIn;
+
+function hash(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){return()=>(seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296}
+function toast(t){const el=document.getElementById("toast");el.textContent=t;el.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("show"),1900)}
+function addPoints(n,why){S.points+=n;save();renderHeader();toast(`+${n} · ${why}`);setTimeout(checkGift,1000)}
+function confetti(){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  for(let i=0;i<24;i++){const c=document.createElement("div");c.className="confetti";c.textContent=["🌸","🌼","✨","🍃","🌷"][i%5];
+    c.style.left=Math.random()*100+"vw";c.style.animationDelay=Math.random()*.5+"s";document.body.appendChild(c);setTimeout(()=>c.remove(),2600)}}
+const active=x=>!!(x&&(x.tasks.some(t=>t.done)||x.game||Object.keys(x.games||{}).filter(g=>g!=="legacy").length));
+function streak(){let k=today;if(!active(S.days[k]))k=addDays(k,-1);let n=0;while(active(S.days[k])){n++;k=addDays(k,-1)}return n}
+
+/* ---------- garden ---------- */
+const PLANTS=["daisy","tulip","sunflower","bell","bush","lavender"];
+const PCOL=["var(--petal)","var(--accent)","#F49E7A","#9AD0C2","#F6B6D0","#B9A3F0"];
+function plantSVG(f){
+  const h=f.h,c=f.c,W=44,H=h+40,cx=22;
+  const stem=`<path d="M${cx} ${H} Q${cx+f.bend} ${H-h/2} ${cx} ${H-h}" stroke="var(--moss)" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  const leaf=`<path d="M${cx} ${H-h*.35} q-14 -4 -16 -14 q12 0 16 14z" fill="var(--moss)"/><path d="M${cx} ${H-h*.55} q14 -4 16 -14 q-12 0 -16 14z" fill="var(--moss)"/>`;
+  const top=H-h; let head="";
+  if(f.type==="daisy")head=[0,45,90,135,180,225,270,315].map(a=>`<ellipse cx="${cx}" cy="${top-9}" rx="4.5" ry="9" fill="${c}" transform="rotate(${a} ${cx} ${top})"/>`).join("")+`<circle cx="${cx}" cy="${top}" r="5.5" fill="var(--butter)"/>`;
+  if(f.type==="tulip")head=`<path d="M${cx-11} ${top-16} L${cx-6} ${top-6} L${cx} ${top-18} L${cx+6} ${top-6} L${cx+11} ${top-16} Q${cx+12} ${top+6} ${cx} ${top+6} Q${cx-12} ${top+6} ${cx-11} ${top-16}z" fill="${c}"/>`;
+  if(f.type==="sunflower")head=Array.from({length:12},(_,i)=>`<ellipse cx="${cx}" cy="${top-12}" rx="4" ry="8" fill="var(--butter)" transform="rotate(${i*30} ${cx} ${top})"/>`).join("")+`<circle cx="${cx}" cy="${top}" r="8" fill="#6B4A2E"/>`;
+  if(f.type==="bell")head=`<path d="M${cx} ${top} q-4 4 -4 10 q-6 0 -6 10 h20 q0 -10 -6 -10 q0 -6 -4 -10z" fill="${c}" transform="rotate(25 ${cx} ${top})"/><path d="M${cx} ${top} q8 -2 14 6" stroke="var(--moss)" stroke-width="2" fill="none"/>`;
+  if(f.type==="bush")head=`<circle cx="${cx-9}" cy="${top+6}" r="10" fill="var(--moss)"/><circle cx="${cx+9}" cy="${top+6}" r="10" fill="var(--moss)"/><circle cx="${cx}" cy="${top-4}" r="12" fill="var(--grass)"/>`+[[-10,2],[6,-8],[10,8],[-3,10]].map(([x,y])=>`<circle cx="${cx+x}" cy="${top+y}" r="3" fill="${c}"/>`).join("");
+  if(f.type==="lavender")head=Array.from({length:7},(_,i)=>`<ellipse cx="${cx+(i%2?3:-3)}" cy="${top+12-i*5}" rx="3.5" ry="4" fill="${c}"/>`).join("");
+  if(f.type==="rainbow")head=["#F27979","#F4A261","#F2C85B","#8FC77E","#6FB3E0","#B48AE0"].map((col,i)=>`<ellipse cx="${cx}" cy="${top-10}" rx="5" ry="10" fill="${col}" transform="rotate(${i*60} ${cx} ${top})"/>`).join("")+`<circle cx="${cx}" cy="${top}" r="6" fill="#fff"/>`;
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">${stem}${f.type==="bush"?"":leaf}${head}</svg>`;
+}
+const nightFor=k=>{const d=S.days[k];if(d&&typeof d.night==="boolean")return d.night;if(k!==today)return false;const h=new Date().getHours();return h>=19||h<6};
+function renderGarden(animateLast){
+  const g=document.getElementById("garden"),d=day(cur);
+  const night=nightFor(cur);
+  g.classList.toggle("night",night);
+  document.getElementById("nightBtn").setAttribute("aria-pressed",night);
+  let html=`<div class="celestial"></div>`;
+  const r=rng(hash(cur+"stars"));
+  for(let i=0;i<18;i++)html+=`<div class="star" style="left:${r()*100}%;top:${r()*45}%"></div>`;
+  html+=`<div class="cloud" style="top:30px;animation-delay:-${r()*60}s"></div><div class="cloud" style="top:70px;animation-delay:-${r()*60}s;animation-duration:85s"></div><div class="ground"></div>`;
+  const dd=day(cur);if(!dd.weather){dd.weather=weatherFor(cur);save()}const wx=dd.weather;
+  g.classList.remove("w-sunny","w-cloudy","w-rainy","w-snowy");g.classList.add("w-"+wx);
+  document.getElementById("weatherBtn").textContent=WX[wx];
+  if(wx!=="sunny")for(let i=0;i<4;i++)html+=`<div class="cloud ${wx==="snowy"?"":"dark"}" style="top:${10+r()*70}px;animation-delay:-${r()*60}s;animation-duration:${50+r()*40}s;transform:scale(${1+r()*.6})"></div>`;
+  if(wx==="rainy")for(let i=0;i<55;i++)html+=`<div class="drop" style="left:${r()*104}%;animation-delay:-${r()}s;animation-duration:${.6+r()*.4}s"></div>`;
+  if(wx==="snowy")for(let i=0;i<40;i++)html+=`<div class="flake" style="left:${r()*100}%;animation-delay:-${r()*7}s;font-size:${8+r()*10}px">❄</div>`;
+  {const mo=+cur.slice(5,7),sea=[12,1,2].includes(mo)?"Winter":mo<=5?"Spring":mo<=8?"Summer":"Autumn",ic={Winter:"⛄",Spring:"🌱",Summer:"🌞",Autumn:"🍂"}[sea];
+   html+=`<div class="monthtag"><b>${new Date(cur+"T12:00").toLocaleDateString(undefined,{month:"long"})}</b><small>${ic} ${sea}</small></div>`;
+   if(wx!=="snowy"&&sea==="Autumn")for(let i=0;i<8;i++)html+=`<div class="leaf" style="left:${r()*100}%;animation-delay:-${r()*8}s">${r()<.5?"🍂":"🍁"}</div>`;
+   if(wx!=="snowy"&&sea==="Spring")for(let i=0;i<6;i++)html+=`<div class="leaf" style="left:${r()*100}%;animation-delay:-${r()*8}s">🌸</div>`;}
+  g.innerHTML=html;
+  if(!d.flowers.length){g.insertAdjacentHTML("beforeend",`<div class="gempty">Finish a task to grow your first plant 🌱</div>`);return}
+  const n=d.flowers.length,gw=g.clientWidth||700,perRow=Math.max(5,Math.floor((gw-20)/54)),rows=Math.ceil(n/perRow);
+  d.flowers.forEach((f,i)=>{
+    f.type ||= "daisy";
+    const row=Math.floor(i/perRow),inRow=Math.min(perRow,n-row*perRow),j=i%perRow,back=rows-1-row;
+    const px=4+(j+0.5)*(92/inRow)+(row%2?46/inRow:0)*0+((hash(String(i))%7)-3)*0.6,sc=1-back*0.18;
+    const b=document.createElement("button");b.className="plant"+(animateLast&&i===d.flowers.length-1?" new":"");
+    b.style.left=`calc(${px}% - 22px)`;b.style.bottom=`${44+back*22}px`;b.style.transform=`scale(${sc})`;b.style.zIndex=50-back*10+(j%2);b.innerHTML=plantSVG(f);
+    b.setAttribute("aria-label",`${f.type} grown by: ${f.task||"a task"}`);
+    b.querySelector("svg").style.animationDelay=`-${(i*0.7)%4}s`;
+    b.onclick=()=>{b.classList.remove("wiggle");void b.offsetWidth;b.classList.add("wiggle");
+      g.querySelectorAll(".gtip").forEach(t=>t.remove());
+      const tip=document.createElement("div");tip.className="gtip";tip.textContent=`${f.type} · ${f.task||"a task"}`;
+      tip.style.left=`calc(${px}%)`;tip.style.top=`${Math.max(30,260-44-back*22-(f.h+40)*sc-10)}px`;g.appendChild(tip);setTimeout(()=>tip.remove(),2200)};
+    g.appendChild(b);
+  });
+  const done=d.flowers.length;
+  for(let i=0;i<Math.min(3,Math.floor(done/3));i++)g.insertAdjacentHTML("beforeend",`<div class="bfly" style="left:${10+i*25}%;top:${60+i*20}px;animation-delay:-${i*3}s">${night?"✨":"🦋"}</div>`);
+}
+document.getElementById("nightBtn").onclick=()=>{const d=day(cur);d.night=!nightFor(cur);save();renderGarden(false)};
+const WX={sunny:"☀️ Sunny",cloudy:"☁️ Cloudy",rainy:"🌧️ Rainy",snowy:"❄️ Snowy"};
+function weatherFor(k){const d=S.days[k];if(d?.weather)return d.weather;const m=d?.mood;
+  if(["😔","😢","😭","😞"].includes(m))return"rainy";if(["😴","😐","😶","🤒","😩"].includes(m))return"cloudy";if(m==="🥶")return"snowy";
+  const mo=+k.slice(5,7),r=hash(k+"wx")%10;
+  if([12,1,2].includes(mo))return r<4?"snowy":r<7?"cloudy":"sunny";
+  if([3,4,5].includes(mo))return r<3?"rainy":r<5?"cloudy":"sunny";
+  if([6,7,8].includes(mo))return r<2?"rainy":r<3?"cloudy":"sunny";
+  return r<2?"rainy":r<5?"cloudy":"sunny"}
+document.getElementById("weatherBtn").onclick=()=>{const order=["sunny","cloudy","rainy","snowy"],d=day(cur);d.weather=order[(order.indexOf(weatherFor(cur))+1)%4];save();renderGarden(false)};
+document.getElementById("waterBtn").onclick=()=>{
+  const d=day(cur);if(!d.flowers.length){toast("Nothing to water yet");return}
+  if(d.watered){toast("Already watered today 💧");return}
+  d.watered=true;d.flowers.forEach(f=>f.h=Math.min(f.h+12,140));save();renderGarden(false);
+  document.querySelectorAll(".plant").forEach(p=>p.classList.add("wiggle"));addPoints(5,"plants watered 💧")};
+
+/* ---------- week strip ---------- */
+function renderWeek(){
+  const w=document.getElementById("week");w.innerHTML="";
+  const prev=document.createElement("button");prev.className="arrow";prev.textContent="‹";prev.setAttribute("aria-label","Previous day");prev.onclick=()=>shift(-1);w.appendChild(prev);
+  let end=addDays(cur,3);if(end>today)end=today;const startK=addDays(end,-6);
+  for(let i=0;i<7;i++){const k=addDays(startK,i),d=S.days[k],dt=new Date(k+"T12:00");
+    const b=document.createElement("button");b.className="dchip";if(k===cur)b.setAttribute("aria-current","date");
+    const n=d?d.tasks.filter(t=>t.done).length:0;
+    if(d?.mood&&MOODCOL[d.mood])b.style.setProperty("--mc",MOODCOL[d.mood]);
+    b.innerHTML=`<span>${dt.toLocaleDateString(undefined,{weekday:"short"})}</span><span class="n">${dt.getDate()}</span><span class="e">${d?.mood||"·"}</span><span class="dots">${"<i></i>".repeat(Math.min(n,5))}</span>`;
+    b.setAttribute("aria-label",dt.toDateString());b.onclick=()=>{cur=k;gameDay=k;renderAll()};w.appendChild(b)}
+  const nx=document.createElement("button");nx.className="arrow";nx.textContent="›";nx.setAttribute("aria-label","Next day");nx.disabled=cur===today;nx.onclick=()=>shift(1);w.appendChild(nx);
+}
+function shift(n){const k=addDays(cur,n);if(k>today)return;cur=k;gameDay=k;renderAll()}
+
+/* ---------- tasks ---------- */
+function renderTasks(){
+  const ul=document.getElementById("taskList"),d=day(cur),done=d.tasks.filter(t=>t.done).length;
+  document.getElementById("taskCount").textContent=d.tasks.length?`${done} of ${d.tasks.length} done`:"";
+  document.getElementById("prog").style.width=d.tasks.length?(done/d.tasks.length*100)+"%":"0";
+  ul.innerHTML=d.tasks.length?"":`<li style="color:var(--soft);padding:10px 2px">No tasks yet. Every finished one plants something new.</li>`;
+  d.tasks.forEach((t,i)=>{
+    const li=document.createElement("li");li.className="task"+(t.done?" done":"");
+    li.innerHTML=`<label><input type="checkbox" ${t.done?"checked":""}><span class="t"></span></label><span class="seed">${t.done?"🌷":"🌰"}</span><button class="del" aria-label="Delete task">✕</button>`;
+    li.querySelector(".t").textContent=t.text;
+    li.querySelector("input").onchange=e=>{
+      t.done=e.target.checked;
+      if(t.done){d.flowers.push({x:5+Math.random()*82,c:PCOL[Math.floor(Math.random()*PCOL.length)],h:45+Math.random()*60,bend:Math.random()*12-6,type:PLANTS[Math.floor(Math.random()*PLANTS.length)],task:t.text});
+        save();renderGarden(true);addPoints(10,"task done 🌸");if(d.tasks.every(x=>x.done)&&d.tasks.length>1){confetti();addPoints(20,"all tasks done!")}}
+      else{const fi=d.flowers.findIndex(f=>f.task===t.text);d.flowers.splice(fi>=0?fi:d.flowers.length-1,1);S.points=Math.max(0,S.points-10);save();renderGarden(false);renderHeader()}
+      renderTasks();renderWeek();
+    };
+    li.querySelector(".del").onclick=()=>{if(t.done){const fi=d.flowers.findIndex(f=>f.task===t.text);d.flowers.splice(fi>=0?fi:d.flowers.length-1,1);S.points=Math.max(0,S.points-10)}
+      d.tasks.splice(i,1);save();renderTasks();renderGarden(false);renderHeader();renderWeek()};
+    ul.appendChild(li);
+  });
+}
+function addTask(){const inp=document.getElementById("taskInput"),v=inp.value.trim();if(!v)return;day(cur).tasks.push({text:v,done:false});inp.value="";save();renderTasks()}
+document.getElementById("addTask").onclick=addTask;
+document.getElementById("taskInput").onkeydown=e=>{if(e.key==="Enter")addTask()};
+
+/* ---------- mood + note ---------- */
+const MOODCOL={"🤩":"#FFB020","😄":"#FFD23F","🥰":"#FF6F91","😊":"#FF9F43","🙂":"#7BC950","😌":"#2EC4B6","🤗":"#F78FB3","😎":"#3FA7F5","🥳":"#C86BFA","💪":"#FF7A3D","🤔":"#9B8CFF","😐":"#B0A99F","😶":"#9E9AA8","😴":"#6C7AE0","🤒":"#A3C24A","😩":"#B5835A","😔":"#5D8BD6","😞":"#4F6FA8","😢":"#3A7BD5","😭":"#2F5FB3","😰":"#7FA6C9","😤":"#F25C54","😡":"#D62839","🥶":"#5BC0EB"};
+const MOODS=Object.keys(MOODCOL);
+function renderMood(){const box=document.getElementById("moods"),d=day(cur);box.innerHTML="";
+  MOODS.forEach(m=>{const b=document.createElement("button");b.textContent=m;b.setAttribute("aria-pressed",d.mood===m);b.setAttribute("aria-label","Mood "+m);
+    if(d.mood===m){b.style.background=`color-mix(in srgb,${MOODCOL[m]} 60%,var(--surface))`;b.style.borderColor=MOODCOL[m]}
+    b.onclick=()=>{d.mood=d.mood===m?null:m;save();renderMood();renderWeek();renderGarden(false)};box.appendChild(b)})}
+const note=document.getElementById("note");
+note.oninput=()=>{day(cur).note=note.value;save()};
+
+/* ---------- picture art for the puzzle ---------- */
+function sceneSVG(seed){
+  const r=rng(seed),pal=[["#F6C7A8","#E98A8A","#7A5C9E","#3E4E7A"],["#BFE3F2","#8FC7A3","#3F7F6B","#F2D06B"],["#F7E1F0","#C9A7EB","#8E5FB8","#F49E7A"],["#FFE6A7","#F49E7A","#C0566B","#4B3B6B"],["#D8F0E6","#7FBFA0","#2F6F68","#F2C85B"]][Math.floor(r()*5)];
+  const kind=Math.floor(r()*3);let s=`<rect width="300" height="300" fill="${pal[0]}"/>`;
+  s+=`<circle cx="${70+r()*160}" cy="${60+r()*40}" r="${28+r()*14}" fill="${pal[3]}"/>`;
+  if(kind===0){for(let i=0;i<3;i++)s+=`<path d="M0 ${300-i*40} L${60+r()*60} ${150+i*30-r()*40} L${150+r()*50} ${220-i*20} L${230+r()*40} ${140+i*30} L300 ${210-i*10} V300 H0z" fill="${pal[1+i%3]}" opacity="${.9-i*.15}"/>`}
+  if(kind===1){s+=`<rect y="190" width="300" height="110" fill="${pal[2]}"/>`;for(let i=0;i<6;i++)s+=`<path d="M0 ${200+i*16} q37 -10 75 0 t75 0 t75 0 t75 0" stroke="${pal[0]}" stroke-width="3" fill="none" opacity=".5"/>`;
+    s+=`<path d="M90 190 h120 l-20 30 h-80z" fill="${pal[3]}"/><path d="M150 100 v90 M150 105 l45 70 h-45z" stroke="${pal[3]}" stroke-width="4" fill="${pal[1]}"/>`}
+  if(kind===2){s+=`<rect y="220" width="300" height="80" fill="${pal[2]}"/>`;for(let i=0;i<5;i++){const x=30+i*60,h=60+r()*60;
+    s+=`<path d="M${x} 230 v-${h}" stroke="${pal[2]}" stroke-width="5"/>`+[0,60,120,180,240,300].map(a=>`<ellipse cx="${x}" cy="${230-h-14}" rx="8" ry="15" fill="${pal[1]}" transform="rotate(${a} ${x} ${230-h})"/>`).join("")+`<circle cx="${x}" cy="${230-h}" r="8" fill="${pal[3]}"/>`}}
+  return "data:image/svg+xml;utf8,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">${s}</svg>`);
+}
+
+/* ---------- games ---------- */
+const GAMES={sequence:"🧩 Number pattern",stroop:"🎨 Colour focus",recall:"🧠 Memory recall",oddone:"🔍 Odd one out",picture:"🖼️ Picture slide",catch:"🦋 Catch butterflies",fillgap:"✏️ Fill the gap",riddle:"💡 Emoji riddle",make10:"🎯 Make the target",simon:"🌷 Flower echo",scramble:"🔤 Word scramble",memory:"🃏 Memory match",guess:"🔢 Number guess",math:"➗ Quick math"};
+const WORDS=["garden","journal","sunrise","lantern","meadow","pebble","harbor","whisper","compass","velvet","orchard","canyon","marble","horizon","blossom","comet","island","thunder","balloon","castle","dragon","forest","glacier","hammock","jungle","kettle","ladder","mango","needle","octopus","pepper","quiver","rocket","saddle","tunnel","umbrella","valley","walnut","yogurt","zebra","anchor","basket","candle","desert","engine","feather","giraffe","harvest","insect","jacket","kitten","lemon","mirror","nectar","orange","parrot","puzzle","rabbit","silver","teapot","violin","window","bridge","cactus","dolphin","eclipse","falcon","guitar","helmet","iceberg","jigsaw","koala","lizard","magnet","noodle","oyster","peanut","raisin","squirrel","tomato","turtle","volcano","wizard","breeze","cookie","flower","planet","spider","sunset","shadow","pillow","mitten"];
+function fresh(name,arr,n){S.seen ||= {};let seen=new Set(S.seen[name]||[]);let avail=arr.map((_,i)=>i).filter(i=>!seen.has(i));
+  if(avail.length<n){seen=new Set();avail=arr.map((_,i)=>i)}
+  const pick=avail.sort(()=>Math.random()-.5).slice(0,n);pick.forEach(i=>seen.add(i));S.seen[name]=[...seen];save();return pick.map(i=>arr[i])}
+const EMO=["🌸","🍋","🐝","🌙","🍄","🦋","⭐","🍒"];
+const md=(a,b)=>((a%b)+b)%b;
+const dailyKinds=k=>{const wd=new Date(k+"T12:00").getDay(),wk=Math.floor(dayNum(k)/7),o=wd+wk;
+  const WORD=["scramble","fillgap","riddle"],NUM=["math","sequence","make10","guess"],BRAIN=["catch","stroop","memory","recall","oddone"];
+  const ks=[WORD[md(o,3)],NUM[md(o,4)],BRAIN[md(o,5)]];if(wd===0||wd===6)ks.push("simon");return ks};
+const isWon=(k,kind)=>k===today?!!day(k).games[kind]:!!(S.fun&&S.fun[k]&&S.fun[k][kind]);
+let replay=false;
+function winGame(kind){
+  if(gameDay!==today||day(today).games[kind]){S.fun ||= {};(S.fun[gameDay] ||= {})[kind]=true;save();confetti();toast("Nice! Played just for fun 🎈");renderGameArea();return}
+  const d=day(today);d.games[kind]=true;d.game=true;
+  const bonus=has("streakbonus")&&streak()>=7?2:1;
+  save();confetti();addPoints(25*bonus,"game won 🎉");renderGameArea();
+}
+function renderGameArea(){
+  const kinds=dailyKinds(gameDay);if(!kinds.includes(gameKind))gameKind=kinds[0];
+  const d=day(gameDay);
+  document.getElementById("gameDay").textContent=gameDay===today?`${kinds.length} games today, 25 points each`:`${new Date(gameDay+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric"})}, just for fun (no points or streak)`;
+  const tabs=document.getElementById("gameTabs");tabs.innerHTML="";
+  kinds.forEach(k=>{const b=document.createElement("button");b.className="chipbtn";b.setAttribute("aria-pressed",k===gameKind);b.textContent=GAMES[k]+(isWon(gameDay,k)?" ✓":"");b.onclick=()=>{gameKind=k;renderGameArea()};tabs.appendChild(b)});
+  renderGame();renderArchive();
+}
+function renderArchive(){
+  const a=document.getElementById("archive");a.innerHTML=`<span style="font-size:.85rem;color:var(--soft);width:100%">Replay earlier days</span>`;
+  const n=Math.min(dayNum(today),20);
+  for(let i=0;i<=n;i++){const k=addDays(today,-i),d=S.days[k],won=dailyKinds(k).every(x=>isWon(k,x));
+    const b=document.createElement("button");b.textContent=i===0?"Today":new Date(k+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric"});
+    if(won)b.className="won";if(k===gameDay)b.setAttribute("aria-current","true");
+    b.onclick=()=>{gameDay=k;renderGameArea()};a.appendChild(b)}
+  if(n===0)a.insertAdjacentHTML("beforeend",`<span style="font-size:.85rem;color:var(--soft)">Past days will appear here from tomorrow.</span>`);
+}
+function renderGame(){
+  const box=document.getElementById("game"),d=day(gameDay),kind=gameKind,r=Math.random;
+  if(isWon(gameDay,kind)&&!replay){box.innerHTML=`<div class="solved">✨ ${gameDay===today?"Solved, points added.":"Solved for fun."} <button class="btn ghost" id="again">Play again for fun</button></div>`;box.querySelector("#again").onclick=()=>{replay=true;renderGame();replay=false};return}
+
+  if(kind==="catch"){
+    box.innerHTML=`<p>Tap 12 butterflies in 20 seconds. Bees 🐝 cost you 2 seconds!</p><div class="catcharea" id="ca"><button class="btn" id="startc">Start</button></div><div class="msg" id="m"></div>`;
+    const ca=box.querySelector("#ca"),m=box.querySelector("#m");
+    const start=()=>{let got=0,t=20,over=false;ca.innerHTML="";const upd=()=>m.textContent=`Caught ${got} of 12, ${t}s left`;upd();
+      const end=win=>{if(over)return;over=true;clearInterval(sp);clearInterval(tm);
+        if(!document.body.contains(ca))return;
+        if(win)winGame(kind);else{ca.innerHTML=`<button class="btn" id="again2">Try again</button>`;m.textContent=`You caught ${got}. So close!`;ca.querySelector("#again2").onclick=start}};
+      const spawn=()=>{if(!document.body.contains(ca)){end(false);return}
+        const b=document.createElement("button");b.className="bug";const bee=Math.random()<.18;b.textContent=bee?"🐝":"🦋";b.setAttribute("aria-label",bee?"Bee":"Butterfly");
+        b.style.left=Math.random()*82+"%";b.style.top=Math.random()*72+"%";
+        b.onclick=()=>{if(over)return;if(bee){t=Math.max(0,t-2);b.remove();upd();if(t<=0)end(false);return}
+          got++;b.classList.add("pop");setTimeout(()=>b.remove(),200);upd();if(got>=12)end(true)};
+        ca.appendChild(b);setTimeout(()=>b.remove(),1400)};
+      const sp=setInterval(spawn,520),tm=setInterval(()=>{t--;upd();if(t<=0)end(false)},1000)};
+    box.querySelector("#startc").onclick=start;
+  }
+  if(kind==="fillgap"){
+    const pool=fresh("words",WORDS,4);let i=0;
+    const show=()=>{const w=pool[i],idx=[...Array(w.length).keys()].sort(()=>r()-.5).slice(0,w.length>6?3:2).sort((a,b)=>a-b);
+      let pos=0;const filled=w.split("").map((c,j)=>idx.includes(j)?"_":c);
+      const letters=[...new Set([...idx.map(j=>w[j]),..."abcdeghilmnoprstuw".split("").sort(()=>r()-.5).slice(0,4)])].sort(()=>r()-.5);
+      box.innerHTML=`<p>Tap the missing letters in order. Word ${i+1} of 4</p><div class="scr" id="fw">${filled.join("")}</div><div class="cbtns" id="lt" style="margin-top:10px"></div><div class="msg" id="m"></div>`;
+      letters.forEach(L=>{const b=document.createElement("button");b.textContent=L.toUpperCase();b.onclick=()=>{
+        const j=idx[pos];if(w[j]===L){filled[j]=L;pos++;box.querySelector("#fw").textContent=filled.join("");box.querySelector("#m").textContent="";
+          if(pos===idx.length){i++;setTimeout(()=>i===4?winGame(kind):show(),450)}}else box.querySelector("#m").textContent="Not that letter, try another"};
+        box.querySelector("#lt").appendChild(b)})};
+    show();
+  }
+  if(kind==="riddle"){
+    const RID=[["🐝 + 🐝","bumblebee"],["🌞 + 👓","sunglasses"],["⭐ + 💡","starlight"],["🌧️ + 🧥","raincoat"],["🔥 + 🧯","fireproof"],["🥜 + 🧈","peanut butter"],["🍓 + 🍰","strawberry cake"],["🏠 + 🔑","house key"],["🐟 + 🎣","fishing"],["⛈️ + ☁️","storm cloud"],["🌙 + 🌻","moonflower"],["🍳 + 🎂","pancake"],["🐴 + 🦶","horseshoe"],["🦈 + 🦷","shark tooth"],["🧊 + 🍦","ice cream"],["🌲 + 🏠","treehouse"],["🦶 + 🖨️","footprint"],["🌞 + 🌅","sunrise"],["❄️ + 🥏","snowflake"],["🐉 + 🪰","dragonfly"],["🌊 + 🐚","seashell"],["📖 + 🏪","bookstore"],["🎵 + 📦","music box"],["⏰ + 🐓","wake-up call"],["🌧️ + 🌈","rainbow"],["☀️ + 🌻","sunflower"],["🔥 + 🚒","fire truck"],["🍯 + 🐝","honeybee"],["⭐ + 🐟","starfish"],["🎂 + 🎉","birthday"],["❄️ + ⛄","snowman"],["🐱 + 🐟","catfish"],["🦶 + ⚽","football"],["🧈 + 🪰","butterfly"],["🌽 + 💥","popcorn"],["🏖️ + 🏰","sandcastle"],["🦷 + 🪥","toothbrush"],["🔥 + 🐶","hot dog"],["📚 + 🐛","bookworm"],["🌙 + 💡","moonlight"]];
+    const pick=fresh("rid",RID,4);let i=0;
+    const show=()=>{const [e,a]=pick[i],opts=[a,...RID.filter(x=>x[1]!==a).sort(()=>r()-.5).slice(0,3).map(x=>x[1])].sort(()=>r()-.5);
+      box.innerHTML=`<p>Which word do these emojis make? ${i+1} of 4</p><div class="scr" style="letter-spacing:.05em">${e}</div><div class="opts">${opts.map(o=>`<button>${o}</button>`).join("")}</div><div class="msg" id="m"></div>`;
+      box.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>{if(b.textContent===a){i++;i===4?winGame(kind):show()}else{b.style.opacity=.35;box.querySelector("#m").textContent="Say the two pictures out loud together"}})};
+    show();
+  }
+  if(kind==="make10"){let i=0;
+    const show=()=>{const T=8+Math.floor(r()*13),a=1+Math.floor(r()*(T-1)),arr=[a,T-a];while(arr.length<6)arr.push(1+Math.floor(r()*(T+3)));arr.sort(()=>r()-.5);let sel=null;
+      box.innerHTML=`<p>Tap two numbers that add up to <b>${T}</b>. Round ${i+1} of 4</p><div class="odd" id="nb"></div><div class="msg" id="m"></div>`;
+      const reset=()=>{box.querySelectorAll("#nb button").forEach(x=>{x.style.borderColor="";x.style.borderWidth=""});sel=null};
+      arr.forEach((v,ix)=>{const b=document.createElement("button");b.textContent=v;b.style.fontSize="1.5rem";b.onclick=()=>{
+        if(sel===null){sel=ix;b.style.borderColor="var(--accent)";b.style.borderWidth="3px";return}
+        if(sel===ix){reset();return}
+        if(arr[sel]+v===T){i++;i===4?winGame(kind):show()}else{box.querySelector("#m").textContent=`${arr[sel]} + ${v} = ${arr[sel]+v}. Try another pair.`;reset()}};
+        box.querySelector("#nb").appendChild(b)})};
+    show();
+  }
+  if(kind==="simon"){
+    const F=["🌷","🌻","🌸","🪻"];let seq=[],step=0,lock=true;
+    box.innerHTML=`<p>Weekend special! Watch the flowers light up, then tap them in the same order. Reach 6 in a row to win.</p><div class="simon">${F.map((f,i)=>`<button data-i="${i}" aria-label="Flower ${i+1}">${f}</button>`).join("")}</div><div class="msg" id="m"></div><button class="btn" id="go">Start</button>`;
+    const btns=[...box.querySelectorAll(".simon button")],m=box.querySelector("#m");
+    const flash=i=>{btns[i].classList.add("lit");setTimeout(()=>btns[i].classList.remove("lit"),380)};
+    const next=()=>{seq.push(Math.floor(Math.random()*4));lock=true;step=0;m.textContent="Watch…";
+      seq.forEach((v,j)=>setTimeout(()=>flash(v),600*j+400));setTimeout(()=>{lock=false;m.textContent=`Your turn: ${seq.length} flower${seq.length>1?"s":""}`},600*seq.length+400)};
+    const begin=e=>{e.target.remove();seq=[];next()};
+    box.querySelector("#go").onclick=begin;
+    btns.forEach(b=>b.onclick=()=>{if(lock)return;const i=+b.dataset.i;flash(i);
+      if(i!==seq[step]){lock=true;m.textContent=`Oops! You remembered ${seq.length-1} in a row.`;box.insertAdjacentHTML("beforeend",`<button class="btn" id="go2">Try again</button>`);box.querySelector("#go2").onclick=begin;return}
+      step++;if(step===seq.length){lock=true;if(seq.length>=6)setTimeout(()=>winGame(kind),400);else setTimeout(next,700)}});
+  }
+  if(kind==="oddone"){
+    const SETS=[["🍓","🍒","🍎","🥦"],["🐄","🐑","🐖","🦈"],["🚲","🛴","🛹","🚁"],["🎃","👻","🦇","🎄"],["🥛","🧃","☕","🍪"],["🌧️","⛈️","🌨️","🔥"],["🐬","🐳","🦭","🐫"],["👟","👢","👞","🧢"],["🍰","🧁","🍩","🥒"],["📱","💻","🖥️","🪴"],["🦒","🐘","🦓","🐧"],["🥄","🍴","🔪","🪥"],["🎺","🎷","🎻","🏈"],["🌵","🌴","🌳","🐚"],["🚂","🚃","🚋","⛵"],["😀","😃","😄","🐶"],["🧀","🥚","🥛","🍫"],["🏀","⚾","🏐","🎲"],["🌷","🌹","🌺","🍄"],["🐊","🦎","🐍","🐸"],["🍎","🍌","🍇","🥕"],["🐶","🐱","🐰","🐟"],["🚗","🚕","🚌","✈️"],["⚽","🏀","🎾","🎸"],["🌹","🌻","🌷","🌲"],["🍕","🍔","🌭","🍦"],["🐦","🦅","🦉","🦇"],["🎹","🎻","🥁","📚"],["🦁","🐯","🐆","🐘"],["✏️","🖊️","🖍️","📏"],["🍋","🍊","🍏","🍞"],["🐝","🦋","🐞","🐌"],["🧥","🧤","🧣","🩱"],["🔨","🔧","🪛","🍴"],["🌍","🪐","🌕","🏠"]];
+    const pick=fresh("sets",SETS,5);let i=0;
+    const show=()=>{const set=pick[i],odd=set[3],items=[...set].sort(()=>r()-.5);
+      box.innerHTML=`<p>Which one doesn’t belong? ${i+1} of 5</p><div class="odd">${items.map(e=>`<button>${e}</button>`).join("")}</div><div class="msg" id="m"></div>`;
+      box.querySelectorAll(".odd button").forEach(b=>b.onclick=()=>{if(b.textContent===odd){i++;i===5?winGame(kind):show()}else{b.style.opacity=.3;box.querySelector("#m").textContent="Think about what the other three share"}})};
+    show();
+  }
+  if(kind==="scramble"){
+    const w=fresh("words",WORDS,1)[0];let s;do{s=w.split("").sort(()=>r()-.5).join("")}while(s===w);
+    box.innerHTML=`<p>Unscramble the word</p><div class="scr">${s}</div><div class="row" style="margin-top:10px"><input id="g" aria-label="Your answer"><button class="btn" id="go">Check</button><button class="btn ghost" id="hint">Hint</button></div><div class="msg" id="m"></div>`;
+    const chk=()=>{if(box.querySelector("#g").value.trim().toLowerCase()===w)winGame(kind);else box.querySelector("#m").textContent="Not quite. Try again."};
+    box.querySelector("#go").onclick=chk;box.querySelector("#g").onkeydown=e=>{if(e.key==="Enter")chk()};
+    box.querySelector("#hint").onclick=()=>box.querySelector("#m").textContent=`Starts with “${w[0].toUpperCase()}”`;
+  }
+  if(kind==="guess"){
+    const n=1+Math.floor(r()*50);let tries=0;
+    box.innerHTML=`<p>Guess my number from 1 to 50</p><div class="row"><input id="g" type="number" aria-label="Your guess"><button class="btn" id="go">Guess</button></div><div class="msg" id="m"></div>`;
+    const chk=()=>{const v=+box.querySelector("#g").value;tries++;if(v===n)winGame(kind);else box.querySelector("#m").textContent=`${v<n?"Higher ⬆️":"Lower ⬇️"} (guess ${tries})`};
+    box.querySelector("#go").onclick=chk;box.querySelector("#g").onkeydown=e=>{if(e.key==="Enter")chk()};
+  }
+  if(kind==="memory"){
+    const deck=[...EMO,...EMO].sort(()=>r()-.5);let open=[],matched=new Set(),lock=false;
+    box.innerHTML=`<p>Match all the pairs</p><div class="grid" id="grid"></div>`;const grid=box.querySelector("#grid");
+    deck.forEach((e,i)=>{const b=document.createElement("button");b.className="card";b.setAttribute("aria-label","Card "+(i+1));
+      b.onclick=()=>{if(lock||open.includes(i)||matched.has(i))return;b.textContent=e;b.classList.add("open");open.push(i);
+        if(open.length===2){lock=true;const[a,c]=open;setTimeout(()=>{
+          if(deck[a]===deck[c]){matched.add(a);matched.add(c)}else[a,c].forEach(k=>{grid.children[k].textContent="";grid.children[k].classList.remove("open")});
+          open=[];lock=false;if(matched.size===deck.length)winGame(kind)},600)}};grid.appendChild(b)});
+  }
+  if(kind==="sequence"){
+    const gen=()=>{const t=Math.floor(r()*5),a=1+Math.floor(r()*9),dd=2+Math.floor(r()*7);let s=[];
+      if(t===0)for(let i=0;i<5;i++)s.push(a+dd*i);
+      if(t===1){const m=2+Math.floor(r()*2);for(let i=0;i<5;i++)s.push(a*m**i)}
+      if(t===2)for(let i=0;i<5;i++)s.push((a+i)**2);
+      if(t===3){s=[a,a+1];while(s.length<5)s.push(s.at(-1)+s.at(-2))}
+      if(t===4){s=[a+10];for(let i=0;i<4;i++)s.push(s.at(-1)+(i%2?-2:dd))}
+      return s};
+    const qs=[gen(),gen(),gen()];let i=0;
+    const show=()=>{box.innerHTML=`<p>What comes next? Pattern ${i+1} of 3</p><div class="seqrow">${qs[i].slice(0,4).join(", ")}, ?</div><div class="row"><input id="g" type="number" aria-label="Next number"><button class="btn" id="go">Check</button><button class="btn ghost" id="hint">Hint</button></div><div class="msg" id="m"></div>`;
+      const inp=box.querySelector("#g"),q=qs[i];
+      const chk=()=>{if(+inp.value===q[4]){i++;i===3?winGame(kind):show()}else box.querySelector("#m").textContent="Not that one. Look at how each step changes."};
+      box.querySelector("#go").onclick=chk;inp.onkeydown=e=>{if(e.key==="Enter")chk()};
+      box.querySelector("#hint").onclick=()=>box.querySelector("#m").textContent=`Gaps: ${q.slice(1,4).map((v,j)=>v-q[j]).join(", ")}`};
+    show();
+  }
+  if(kind==="stroop"){
+    const C=[["Red","#E04848"],["Blue","#3D7FD9"],["Green","#3FA45B"],["Purple","#9B5FD0"],["Orange","#E8892E"]];
+    let round=0,score=0;
+    const show=()=>{const w=Math.floor(Math.random()*5);let ink;do{ink=Math.floor(Math.random()*5)}while(ink===w);
+      box.innerHTML=`<p>Tap the colour of the <b>ink</b>, not the word. ${round+1} of 10 · score ${score}</p><div class="stroopword" style="color:${C[ink][1]}">${C[w][0]}</div><div class="cbtns"></div><div class="msg" id="m"></div>`;
+      const cb=box.querySelector(".cbtns");C.forEach(([n],ci)=>{const b=document.createElement("button");b.textContent=n;
+        b.onclick=()=>{if(ci===ink)score++;round++;
+          if(round<10)show();else if(score>=8)winGame(kind);else{box.innerHTML=`<p>You got ${score} of 10. You need 8 to win.</p><button class="btn" id="again">Try again</button>`;box.querySelector("#again").onclick=()=>{round=0;score=0;show()}}};cb.appendChild(b)})};
+    show();
+  }
+  if(kind==="recall"){
+    const POOL=["🍎","🚲","🎈","🐢","🌵","🎸","🍩","🦊","⚓","🔑","🧁","🐳","🌻","🎲","🪁","🍉","🦉","🚀","🎩","🧲","🪀","🐞","🍔","🛶","⏰","🎁","🧩","🦜","🍇","🚜","🏮","🧸","🌶️","🐙","📷","🪐","🦔","🍿","🛎️","🎯"].sort(()=>r()-.5);
+    const shown=POOL.slice(0,6),board=POOL.slice(0,12).sort(()=>r()-.5);
+    box.innerHTML=`<p>Remember these 6 items. They hide in 5 seconds.</p><div class="rgrid">${shown.map(e=>`<button tabindex="-1">${e}</button>`).join("")}</div><div class="msg" id="m">5</div>`;
+    let t=5;const iv=setInterval(()=>{t--;const m=box.querySelector("#m");if(m)m.textContent=t;if(t<=0){clearInterval(iv);ask()}},1000);
+    const ask=()=>{let hits=0,miss=0;box.innerHTML=`<p>Tap the 6 items you saw. One mistake allowed.</p><div class="rgrid" id="rg"></div><div class="msg" id="m"></div>`;
+      board.forEach(e=>{const b=document.createElement("button");b.textContent=e;b.onclick=()=>{if(b.disabled)return;b.disabled=true;
+        if(shown.includes(e)){b.className="hit";hits++}else{b.className="miss";miss++}
+        if(miss>1){box.querySelector("#m").innerHTML=`Two misses. <button class="btn ghost" id="again">Try again</button>`;box.querySelectorAll("#rg button").forEach(x=>x.disabled=true);box.querySelector("#again").onclick=()=>renderGame()}
+        else if(hits===6)setTimeout(()=>winGame(kind),300)};box.querySelector("#rg").appendChild(b)})};
+  }
+  if(kind==="math"){
+    const qs=Array.from({length:5},()=>{const a=2+Math.floor(r()*12),b=2+Math.floor(r()*12),op=r()<.5?"+":"×";return{q:`${a} ${op} ${b}`,a:op==="+"?a+b:a*b}});let i=0;
+    const show=()=>{box.innerHTML=`<p>Quick math, ${i+1} of 5</p><div class="scr">${qs[i].q}</div><div class="row" style="margin-top:10px"><input id="g" type="number" aria-label="Answer"><button class="btn" id="go">Next</button></div><div class="msg" id="m"></div>`;
+      const inp=box.querySelector("#g");const chk=()=>{if(+inp.value===qs[i].a){i++;i===5?winGame(kind):show()}else box.querySelector("#m").textContent="Try again"};
+      box.querySelector("#go").onclick=chk;inp.onkeydown=e=>{if(e.key==="Enter")chk()}};
+    show();
+  }
+}
+
+/* ---------- unlocked features ---------- */
+const PROMPTS=["Who made you smile today?","What’s one small thing that went right?","What are you looking forward to?","What did you learn today?","Which moment would you replay?","What are you proud of this week?","What made today easier?"];
+let timerIv=null,timerLeft=1500;
+function fmt(s){return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
+function renderUnlocked(){
+  const box=document.getElementById("unlocked");let h="";
+  if(has("gratitude"))h+=`<div class="panel"><h2>Reflection</h2><p style="color:var(--soft);margin:0">${PROMPTS[hash(cur)%PROMPTS.length]}</p></div>`;
+  if(has("focus"))h+=`<div class="panel"><h2>Focus timer</h2><div class="row"><span class="timer" id="tm">${fmt(timerLeft)}</span><button class="btn" id="tbtn">${timerIv?"Pause":"Start"}</button></div></div>`;
+  if(has("badges")){const all=Object.values(S.days),tasks=all.reduce((a,d)=>a+d.tasks.filter(t=>t.done).length,0),games=all.reduce((a,d)=>a+Object.keys(d.games||{}).filter(x=>x!=="legacy").length+(d.games?.legacy?1:0),0);
+    const B=[["🌱","First bloom",tasks>=1],["💐","25 tasks",tasks>=25],["🌳","100 tasks",tasks>=100],["🎮","10 games won",games>=10],["🖼️","Picture master",all.filter(d=>d.games?.picture).length>=5],["🔥","7-day streak",streak()>=7],["💎","1,000 points",S.points>=1000]];
+    h+=`<div class="panel"><h2>Badges</h2><div class="badges">${B.map(b=>`<span class="badge ${b[2]?"":"off"}">${b[0]} ${b[1]}</span>`).join("")}</div></div>`}
+  if(has("themes"))h+=`<div class="panel"><h2>Garden colours</h2><div class="row">${["lilac","forest","ocean"].map(p=>`<button class="chipbtn" data-p="${p}" aria-pressed="${S.palette===p}">${p}</button>`).join("")}<button class="chipbtn" data-mode>Switch light / dark</button></div></div>`;
+  box.innerHTML=h;
+  box.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{S.palette=b.dataset.p;save();applyTheme();renderUnlocked()});
+  const m=box.querySelector("[data-mode]");if(m)m.onclick=()=>{const dark=getComputedStyle(document.documentElement).colorScheme.includes("dark");S.mode=dark?"light":"dark";save();applyTheme()};
+  const tb=box.querySelector("#tbtn");if(tb)tb.onclick=()=>{
+    if(timerIv){clearInterval(timerIv);timerIv=null;tb.textContent="Start";return}
+    tb.textContent="Pause";timerIv=setInterval(()=>{timerLeft--;const tm=document.getElementById("tm");if(tm)tm.textContent=fmt(timerLeft);
+      if(timerLeft<=0){clearInterval(timerIv);timerIv=null;timerLeft=1500;addPoints(15,"focus session 🧘");renderUnlocked()}},1000)};
+}
+function applyTheme(){const r=document.documentElement;
+  if(has("themes")&&S.palette!=="lilac")r.dataset.palette=S.palette;else delete r.dataset.palette;
+  if(has("themes")&&S.mode)r.dataset.theme=S.mode}
+
+/* ---------- 4-day streak gifts ---------- */
+const GIFTS=["🦄","🐉","🌈","🪐","🦚","🍀","🎐","🪷","🦊","🐳","🌟","🧸","🎈","🦩","🐢","🐙"];
+function checkGift(){if(!active(S.days[today])){renderStickers();return}const s=streak(),earned=Math.floor(s/4),runStart=addDays(today,-(s-1));
+  if(!S.giftRun||S.giftRun.start!==runStart)S.giftRun={start:runStart,claimed:0};
+  if(earned>S.giftRun.claimed&&!document.querySelector(".giftwrap")){S.giftRun.claimed=earned;save();showGift(s)}
+  renderStickers()}
+function showGift(s){const w=document.createElement("div");w.className="giftwrap";
+  w.innerHTML=`<div class="giftcard" role="dialog" aria-label="Surprise gift"><h2>${s}-day streak!</h2><p style="color:var(--soft)">You’ve shown up ${s} days in a row. Tap the box to open your surprise.</p><button class="giftbox" id="gb" aria-label="Open gift">🎁</button><div id="gr"></div></div>`;
+  document.body.appendChild(w);
+  w.querySelector("#gb").onclick=()=>{const sticker=GIFTS[Math.floor(Math.random()*GIFTS.length)],pts=50+Math.floor(Math.random()*6)*10;
+    (S.stickers ||= []).push(sticker);
+    day(today).flowers.push({x:5+Math.random()*82,c:"#fff",h:95,bend:0,type:"rainbow",task:"Streak gift 🎁"});
+    S.points+=pts;save();confetti();w.querySelector("#gb").remove();
+    w.querySelector("#gr").innerHTML=`<div style="font-size:4rem">${sticker}</div><p><b>+${pts} points</b>, a new sticker and a rare rainbow flower in today’s garden.</p><button class="btn" id="gclose">Collect</button>`;
+    w.querySelector("#gclose").onclick=()=>{w.remove();renderAll()}}}
+function renderStickers(){const s=streak(),prog=s%4,left=4-prog;
+  document.getElementById("giftNext").textContent=`next gift in ${left} streak day${left===1?"":"s"}`;
+  document.getElementById("giftDots").innerHTML=[0,1,2,3].map(i=>`<div class="gstep ${i<prog?"on":""} ${i===3?"big":""}"><span>${i<prog?"🌟":i===3?"🎁":"🔒"}</span><small>${i===3?"Gift":"Day "+(i+1)}</small></div>`).join(`<i class="gline"></i>`);
+  const st=S.stickers||[];document.getElementById("stickers").innerHTML=st.length?st.map(x=>`<span>${x}</span>`).join(""):`<span style="font-size:.95rem;color:var(--soft)">Keep a 4-day streak to unwrap your first surprise.</span>`}
+
+/* ---------- backup ---------- */
+const msgB=t=>document.getElementById("backupMsg").textContent=t;
+function importData(txt){try{const o=JSON.parse(txt);if(!o||!o.days)throw 0;S=o;save();applyTheme();renderAll();msgB("Backup restored ✓")}catch(e){msgB("That backup couldn’t be read. Make sure you copied all of it.")}}
+document.getElementById("dlBackup").onclick=()=>{try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:"application/json"}));a.download=`bloom-backup-${today}.json`;document.body.appendChild(a);a.click();a.remove();msgB("Backup downloaded. If nothing appeared, use “Show backup code”.")}catch(e){msgB("Downloads are blocked here. Use “Show backup code” instead.")}};
+document.getElementById("showBackup").onclick=()=>{const t=document.getElementById("backupText");t.hidden=!t.hidden;t.value=JSON.stringify(S);document.getElementById("restoreRow").hidden=t.hidden;if(!t.hidden)t.select()};
+document.getElementById("restoreBtn").onclick=()=>importData(document.getElementById("backupText").value);
+document.getElementById("fileIn").onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importData)};
+
+/* ---------- weekend spin wheel ---------- */
+function renderWeekend(){const el=document.getElementById("weekend"),wd=new Date().getDay();
+  if(cur!==today||!(wd===0||wd===6)){el.innerHTML="";return}
+  S.spins ||= {};const done=S.spins[today];
+  const P=[["+20","#FF6F91"],["+40","#FFD23F"],["Sticker","#2EC4B6"],["+10","#9B8CFF"],["Rainbow","#3FA7F5"],["+30","#FF9F43"]];
+  const pt=(a,rad)=>[(rad*Math.sin(a*Math.PI/180)).toFixed(1),(-rad*Math.cos(a*Math.PI/180)).toFixed(1)];
+  const slices=P.map(([l,c],i)=>{const [x1,y1]=pt(i*60-30,92),[x2,y2]=pt(i*60+30,92),[tx,ty]=pt(i*60,60);
+    return `<path d="M0 0 L${x1} ${y1} A92 92 0 0 1 ${x2} ${y2}Z" fill="${c}" stroke="#fff" stroke-width="2"/><text x="${tx}" y="${ty}" transform="rotate(${i*60} ${tx} ${ty})" text-anchor="middle" dominant-baseline="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="14" fill="#2A1E33">${l}</text>`}).join("");
+  el.innerHTML=`<div class="panel weekendp"><h2>🎡 Weekend spin <small>one spin each Saturday and Sunday</small></h2><div class="row" style="gap:24px"><div class="wheelwrap"><div class="pointer">▼</div><svg id="wheel" viewBox="-100 -100 200 200" width="180" height="180" aria-hidden="true"><circle r="96" fill="var(--surface)"/>${slices}<circle r="12" fill="var(--surface)" stroke="var(--line)"/></svg></div><div><p id="spinmsg" style="margin:0 0 10px">${done?`Today you won: <b>${done}</b> 🎉`:"Spin for a weekend surprise!"}</p><button class="btn" id="spinBtn" ${done?"disabled":""}>${done?"Spun today":"Spin"}</button></div></div></div>`;
+  if(done)return;
+  el.querySelector("#spinBtn").onclick=e=>{e.target.disabled=true;const idx=Math.floor(Math.random()*6),[label]=P[idx];
+    S.spins[today]=label;save();
+    el.querySelector("#wheel").style.transform=`rotate(${360*5-idx*60}deg)`;
+    setTimeout(()=>{let msg=label;
+      if(label.startsWith("+")){S.points+=+label.slice(1);msg=`${label} points`}
+      if(label==="Sticker"){const st=GIFTS[Math.floor(Math.random()*GIFTS.length)];(S.stickers ||= []).push(st);msg=`a ${st} sticker`}
+      if(label==="Rainbow"){day(today).flowers.push({x:5+Math.random()*82,c:"#fff",h:95,bend:0,type:"rainbow",task:"Weekend spin 🎡"});msg="a rainbow flower for your garden"}
+      S.spins[today]=msg;save();confetti();toast("You won "+msg+"!");renderHeader();renderGarden(true);renderStickers();
+      el.querySelector("#spinmsg").innerHTML=`Today you won: <b>${msg}</b> 🎉`;e.target.textContent="Spun today"},3300)};
+}
+
+/* ---------- main tabs ---------- */
+let tab="day";
+document.querySelectorAll(".maintabs button").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;
+  document.querySelectorAll(".maintabs button").forEach(x=>x.setAttribute("aria-selected",x===b));
+  document.querySelectorAll(".tabpane").forEach(p=>p.hidden=p.dataset.pane!==tab)});
+
+/* ---------- meals ---------- */
+const MEALS=[["breakfast","Breakfast","🥞","Morning"],["lunch","Lunch","🥗","Midday"],["dinner","Dinner","🍲","Evening"],["snacks","Snacks","🍎","Anytime"]];
+const MEALPIC={healthy:{breakfast:"🥣",lunch:"🥗",dinner:"🍛",snacks:"🍎"},unhealthy:{breakfast:"🍩",lunch:"🍔",dinner:"🍕",snacks:"🍟"},skipped:{breakfast:"🍽️",lunch:"🍽️",dinner:"🍽️",snacks:"🍽️"}};
+const TIPS=["Add one colourful vegetable to your next meal 🥕","Water counts too, keep a glass nearby 💧","A handful of nuts makes a great snack 🥜","Fruit for dessert is a sweet win 🍓","Eating slowly helps you enjoy every bite 🌿","Breakfast gives your morning a strong start 🌅"];
+function mealScore(k){const m=S.days[k]?.meals||{};const v=Object.values(m).filter(x=>x.s&&x.s!=="skipped");return{logged:v.length,healthy:v.filter(x=>x.s==="healthy").length}}
+function renderMeals(){const d=day(cur);d.meals ||= {};const box=document.getElementById("meals");box.innerHTML="";
+  MEALS.forEach(([id,name,icon,when])=>{const m=d.meals[id]||{},st=m.s;
+    const c=document.createElement("div");c.className="meal "+(st||"");
+    c.innerHTML=`${st?`<span class="stamp">${st==="healthy"?"🌿 Healthy":st==="unhealthy"?"🍬 Treat":"⏭️ Skipped"}</span>`:""}
+      <div class="top"><div class="plate">${st?MEALPIC[st][id]:icon}</div><div><h3>${name}</h3><div class="when">${when}</div></div></div>
+      <div class="mopts"><button class="h" aria-pressed="${st==="healthy"}"><span>🥦</span>Healthy</button><button class="u" aria-pressed="${st==="unhealthy"}"><span>🍟</span>Unhealthy</button><button class="s" aria-pressed="${st==="skipped"}"><span>⏭️</span>Skipped</button></div>
+      <input placeholder="What did you eat? (optional)" aria-label="${name} notes">`;
+    const inp=c.querySelector("input");inp.value=m.t||"";inp.oninput=()=>{(d.meals[id] ||= {}).t=inp.value;save()};
+    [["h","healthy"],["u","unhealthy"],["s","skipped"]].forEach(([cls,val])=>c.querySelector("."+cls).onclick=()=>{
+      const mm=(d.meals[id] ||= {});const was=mm.s;mm.s=was===val?null:val;
+      if(mm.s==="healthy"&&!mm.rewarded&&cur===today){mm.rewarded=true;save();addPoints(5,`healthy ${name.toLowerCase()} 🥦`)}else save();
+      renderMeals()});
+    box.appendChild(c)});
+  const {logged,healthy}=mealScore(cur),pct=logged?Math.round(healthy/logged*100):0;
+  document.getElementById("mealRing").style.setProperty("--p",pct);document.getElementById("mealPct").textContent=logged?pct+"%":"–";
+  document.getElementById("mealSum").textContent=logged?`${healthy} of ${logged} meals were healthy${healthy===logged&&logged>=3?". Amazing day! 🌟":"."}`:"Tap how each meal went today. Healthy meals earn 5 points.";
+  let wp="";for(let i=6;i>=0;i--){const k=addDays(cur,-i),sc=mealScore(k),col=!sc.logged?"#EEE":sc.healthy/sc.logged>=.67?"#3FAE6A":sc.healthy/sc.logged>=.34?"#F2C85B":"#EE7B30";
+    wp+=`<div title="${k}"><i style="background:${col}"></i>${new Date(k+"T12:00").toLocaleDateString(undefined,{weekday:"narrow"})}</div>`}
+  document.getElementById("weekPlates").innerHTML=wp;
+  document.getElementById("mealTip").textContent="Tip: "+TIPS[hash(cur)%TIPS.length]}
+
+/* ---------- header ---------- */
+function renderHeader(){
+  {const h=new Date().getHours();document.getElementById("greet").textContent=(h<5?"Sweet dreams":h<12?"Good morning":h<17?"Good afternoon":h<21?"Good evening":"Good night")+", let’s grow something today 🌱"}
+  document.getElementById("points").textContent=S.points;
+  document.getElementById("streak").textContent=streak();
+  document.getElementById("bloomCount").textContent=Object.values(S.days).reduce((a,d)=>a+(d.flowers?.length||0),0);
+  const d=new Date(cur+"T12:00");
+  document.getElementById("dateLabel").textContent=(cur===today?"Today, ":"")+d.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"});
+  const nx=UNLOCKS.find(u=>u.week>weeksIn),left=nx?(nx.week-1)*7-dayNum(today):0;
+  document.getElementById("unlockbar").textContent=nx?`Week ${weeksIn}. In ${left} day${left===1?"":"s"} you unlock ${nx.name}: ${nx.desc}.`:`Week ${weeksIn}. Every feature is unlocked.`;
+}
+function renderAll(){renderHeader();renderWeek();renderGarden(false);renderTasks();renderMood();note.value=day(cur).note;renderGameArea();renderUnlocked();renderStickers();renderWeekend();renderMeals()}
+applyTheme();renderAll();setTimeout(checkGift,600);
+
+/* ===== sign-in & cloud sync (Firebase) =====
+   Paste your own Firebase settings below (see setup steps). Until then, Bloom keeps saving on this device only. */
+const FIREBASE_CONFIG={
+  apiKey:"AIzaSyBjs3EIMnPVoI5GqOzbcpEn7TRoDLtQo5s",
+  authDomain:"bloom-f7209.firebaseapp.com",
+  projectId:"bloom-f7209",
+  appId:"1:379274260658:web:17070342ff177a22d3d9ab"
+};
+(function(){
+  const btn=document.getElementById("acctBtn");
+  const configured=FIREBASE_CONFIG.apiKey&&!FIREBASE_CONFIG.apiKey.startsWith("PASTE");
+  const V="10.12.2",base=`https://www.gstatic.com/firebasejs/${V}/`;
+  let auth=null,db=null,user=null,unsub=null,timer=null,lastPush=0,status="",loadFailed=false;
+  const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const load=src=>new Promise((res,rej)=>{const sc=document.createElement("script");sc.src=src;sc.onload=res;sc.onerror=rej;document.head.appendChild(sc)});
+  const ref=()=>db.collection("users").doc(user.uid);
+  const hasProgress=o=>!!o&&Object.values(o.days||{}).some(d=>(d.tasks&&d.tasks.length)||d.mood||d.note||(d.meals&&Object.keys(d.meals).length));
+  function setBtn(){btn.classList.toggle("off",!user);
+    btn.innerHTML=user?`<span class="av">${esc((user.email||"?")[0].toUpperCase())}</span><span class="dot"></span><span>Synced</span>`:`☁️ <span>Sign in</span>`}
+  function setStatus(t){status=t;const el=document.getElementById("syncStatus");if(el)el.textContent=t}
+  function writeLocal(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+  function applyRemote(str,at){window.__applying=true;try{S=JSON.parse(str);S.lastSync=at;writeLocal();applyTheme();renderAll()}catch(e){}window.__applying=false;setStatus("Up to date ✓")}
+  function push(){if(!user)return;const at=Date.now();lastPush=at;S.lastSync=at;writeLocal();
+    return ref().set({data:JSON.stringify(S),updatedAt:at,email:user.email}).then(()=>setStatus("Saved to your account ✓")).catch(()=>setStatus("Offline right now. Saved on this device and will sync later."))}
+  window.__cloudPush=()=>{if(!user||window.__applying||window.__choosing)return;clearTimeout(timer);setStatus("Saving…");timer=setTimeout(push,1200)};
+
+  async function onLogin(u){user=u;setBtn();setStatus("Syncing…");
+    try{const snap=await ref().get();
+      if(!snap.exists){S.cloudUid=u.uid;await push();toast("Your progress is now saved to your account ☁️")}
+      else{const d=snap.data(),at=d.updatedAt||0;let r=null;try{r=JSON.parse(d.data)}catch(e){}
+        if(S.cloudUid===u.uid){ if(at>(S.lastSync||0))applyRemote(d.data,at);else await push() }
+        else if(!hasProgress(S)){applyRemote(d.data,at);S.cloudUid=u.uid;writeLocal();toast("Welcome back! Your progress is loaded ☁️")}
+        else if(!hasProgress(r)){S.cloudUid=u.uid;await push()}
+        else{await askWhich(d,at);S.cloudUid=u.uid;writeLocal()}}
+      if(unsub)unsub();
+      unsub=ref().onSnapshot(sn=>{if(!sn.exists||sn.metadata.hasPendingWrites||window.__choosing)return;const d=sn.data();
+        if(d.updatedAt&&d.updatedAt!==lastPush&&d.updatedAt>(S.lastSync||0)){applyRemote(d.data,d.updatedAt);toast("Updated from your other device ✨")}});
+    }catch(e){setStatus("Couldn’t reach the cloud. Check your Firebase setup.")}}
+
+  function askWhich(remote,at){window.__choosing=true;return new Promise(res=>{
+    const when=new Date(at).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
+    const w=modal(`<div class="hi">🔀</div><h2>Two versions found</h2><p>This device and your account both have Bloom progress. Which one should you keep?</p>
+      <div class="choice"><button id="useCloud">☁️ Use my account’s progress<small>Last saved ${esc(when)}</small></button>
+      <button id="useLocal">📱 Keep this device’s progress<small>Replaces what’s saved in your account</small></button></div>`,false);
+    const done=()=>{w.remove();window.__choosing=false;res()};
+    w.querySelector("#useCloud").onclick=()=>{applyRemote(remote.data,at);done()};
+    w.querySelector("#useLocal").onclick=()=>{window.__choosing=false;push();done()}})}
+
+  function modal(html,closable=true){const w=document.createElement("div");w.className="modalwrap";
+    w.innerHTML=`<div class="modal" role="dialog" aria-modal="true">${closable?'<button class="x" aria-label="Close">✕</button>':""}${html}</div>`;
+    document.body.appendChild(w);if(closable){w.querySelector(".x").onclick=()=>w.remove();w.onclick=e=>{if(e.target===w)w.remove()}}return w}
+
+  const ERR={"auth/invalid-email":"That email doesn’t look right.","auth/missing-password":"Please enter your password.","auth/weak-password":"Use at least 6 characters for your password.",
+    "auth/email-already-in-use":"An account with this email already exists. Try signing in.","auth/invalid-credential":"Email or password is incorrect.",
+    "auth/wrong-password":"Email or password is incorrect.","auth/user-not-found":"No account with this email yet. Tap “Create account”.","auth/too-many-requests":"Too many tries. Wait a minute and try again.",
+    "auth/network-request-failed":"No internet connection.","auth/unauthorized-domain":"This website isn’t on your Firebase “Authorized domains” list yet."};
+  const msg=e=>ERR[e&&e.code]||"Something went wrong. Please try again.";
+
+  function openSignIn(mode="in"){
+    const w=modal(`<div class="hi">🌼</div><h2>${mode==="in"?"Welcome back":"Create your account"}</h2>
+      <p>${mode==="in"?"Sign in to keep your garden safe and use Bloom on any device.":"Your current progress will be saved to your new account."}</p>
+      <label for="em">Email</label><input id="em" type="email" autocomplete="email" placeholder="you@example.com">
+      <label for="pw">Password</label><input id="pw" type="password" autocomplete="${mode==="in"?"current-password":"new-password"}" placeholder="${mode==="in"?"Your password":"At least 6 characters"}">
+      <button class="btn" id="go">${mode==="in"?"Sign in":"Create account"}</button>
+      <div class="err" id="err"></div>
+      <div class="row2"><button class="link" id="sw">${mode==="in"?"New here? Create account":"Have an account? Sign in"}</button>${mode==="in"?'<button class="link" id="fp">Forgot password?</button>':""}</div>`);
+    const em=w.querySelector("#em"),pw=w.querySelector("#pw"),er=w.querySelector("#err"),go=w.querySelector("#go");em.focus();
+    const submit=async()=>{er.className="err";er.textContent="";go.disabled=true;go.textContent="One moment…";
+      try{if(mode==="in")await auth.signInWithEmailAndPassword(em.value.trim(),pw.value);else await auth.createUserWithEmailAndPassword(em.value.trim(),pw.value);w.remove()}
+      catch(e){er.textContent=msg(e);go.disabled=false;go.textContent=mode==="in"?"Sign in":"Create account"}};
+    go.onclick=submit;pw.onkeydown=e=>{if(e.key==="Enter")submit()};
+    w.querySelector("#sw").onclick=()=>{w.remove();openSignIn(mode==="in"?"up":"in")};
+    const fp=w.querySelector("#fp");if(fp)fp.onclick=async()=>{if(!em.value.trim()){er.textContent="Type your email first, then tap “Forgot password?”.";return}
+      try{await auth.sendPasswordResetEmail(em.value.trim());er.className="err ok";er.textContent="Reset link sent. Check your inbox 📬"}catch(e){er.textContent=msg(e)}};
+  }
+  function openAccount(){
+    const w=modal(`<div class="hi">☁️</div><h2>Your account</h2><p>Signed in as <b>${esc(user.email)}</b>. Everything you do saves to your account and appears on all your devices.</p>
+      <p id="syncStatus" style="color:var(--ink);font-weight:700">${esc(status||"Up to date ✓")}</p>
+      <button class="btn" id="syncNow">Sync now</button><button class="btn ghost" id="out">Sign out</button>
+      <p style="margin-top:12px;font-size:.82rem">Signing out keeps a copy on this device.</p>`);
+    w.querySelector("#syncNow").onclick=()=>{setStatus("Saving…");push()};
+    w.querySelector("#out").onclick=async()=>{if(unsub)unsub();unsub=null;await auth.signOut();w.remove();toast("Signed out. Your progress is still on this device.")};
+  }
+  function openNotReady(){
+    modal(`<div class="hi">🔧</div><h2>Sign-in isn’t switched on yet</h2>
+      <p>${loadFailed?"Sign-in works on your own GitHub version of Bloom. This preview can’t connect to the sign-in service.":"Add your Firebase settings to index.html (see the setup steps), upload it to GitHub, and this button will let you sign in."}</p>
+      <p>Your progress is still saved on this device, and you can use Save &amp; backup any time.</p>`)}
+
+  btn.onclick=()=>{if(!configured||loadFailed||!auth)return openNotReady();user?openAccount():openSignIn("in")};
+  setBtn();
+  if(!configured)return;
+  Promise.all([load(base+"firebase-app-compat.js")]).then(()=>Promise.all([load(base+"firebase-auth-compat.js"),load(base+"firebase-firestore-compat.js")])).then(()=>{
+    firebase.initializeApp(FIREBASE_CONFIG);auth=firebase.auth();db=firebase.firestore();
+    try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{})}catch(e){}
+    auth.onAuthStateChanged(u=>{if(u)onLogin(u);else{user=null;if(unsub){unsub();unsub=null}setBtn()}});
+  }).catch(()=>{loadFailed=true});
+})();
+</script>
+</body>
+</html>
