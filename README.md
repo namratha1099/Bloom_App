@@ -1,11 +1,9 @@
-# 🌼 Bloom_App
+# 🌼 Bloom
 
 A daily journal where your small wins grow into a garden.
 
-* Every task becomes a flower. Finish something, even something tiny, and a new plant grows in your garden.
-* Your mood colours your days. Pick an emoji each day and watch your week turn into a colour diary.
-* A little brain workout daily. Short word, number and memory games keep your mind fresh, with a bonus game on weekends.
-* Showing up is rewarded. Points, streaks and a surprise gift every 4 days in a row.
-* Private and yours. Everything saves in your own browser, with a backup option so nothing gets lost.
-
-Open index.html or visit the GitHub Pages link to start blooming.
+* Seeds to Sow: every finished task grows a flower in your garden, with priorities, time-of-day tags and one-tap carry-over of yesterday's unfinished tasks.
+* Daybook: daily mood emojis that colour your week, plus a "Dear diary" page with daily prompts and emojis.
+* Mealtime and Playroom: log healthy meals, hydration and a VIBGYOR plate, and play 3 brain games a day (21 different games, none repeated within a week).
+* Rewards: points, day streaks, a surprise gift every 4 days in a row, and a weekend prize wheel.
+* Saving and sign-in: progress saves in the browser and, after email sign-in with Firebase Authentication.
